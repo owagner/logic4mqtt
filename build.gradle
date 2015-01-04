@@ -1,0 +1,53 @@
+version = '0.3'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+	mavenCentral()
+	maven { 
+		url 'https://repo.eclipse.org/content/repositories/paho-releases/'
+	} 
+}
+
+dependencies {
+	compile 'com.eclipsesource.minimal-json:minimal-json:0.9.1'
+	compile 'org.eclipse.paho:mqtt-client:0.4.0'
+	compile 'com.luckycatlabs:SunriseSunsetCalculator:1.2'
+	compile 'org.quartz-scheduler:quartz:2.2.1'
+	compile('com.joestelmach:natty:0.9') {
+		exclude module: 'antlr'
+		exclude module: 'backport-util-concurrent'
+		exclude module: 'stringtemplate'
+	}
+}
+
+task listJars << {
+    configurations.compile.each { File file -> println file.name }
+}
+
+jar {
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes 	'Main-Class': 'com.tellerulam.logic4mqtt.Main',
+        			'Implementation-Title': 'logic4mqtt Logic Engine',
+                   	'Implementation-Version': version
+    }
+}
+
+task generateApiDocs(type: Javadoc) {	
+	source = fileTree("src/main/java/com/tellerulam/logic4mqtt/api")
+	destinationDir = file("apidocs")
+	options.setMemberLevel(JavadocMemberLevel.PUBLIC)
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'target'
+       }
+    }
+}
