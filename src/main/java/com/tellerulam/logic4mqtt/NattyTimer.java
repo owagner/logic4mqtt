@@ -30,7 +30,7 @@ public class NattyTimer extends LogicTimer
 		schedule();
 	}
 
-	private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |official )?(sunset|sunrise)");
+	private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |civil )?(sunset|sunrise)");
 
 	private void parseTime()
 	{
