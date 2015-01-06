@@ -25,6 +25,9 @@ Dependencies
 * sunrisesunsetlib-java: https://github.com/mikereedell/sunrisesunsetlib-java (for sunrise/sunset calculations)
 * Quartz Scheduler: http://www.quartz-scheduler.org/ (used for cron-alike timer parsing)
 
+[![Build Status](https://travis-ci.org/mqtt-smarthome/logic4mqtt.svg)](https://travis-ci.org/mqtt-smarthome/logic4mqtt)
+
+
 Events
 ------
 Everything in logic4mqtt revolves around the core concept of an _Event_

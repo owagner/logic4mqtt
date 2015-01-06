@@ -97,7 +97,7 @@ public class MQTTHandler
 			L.info("Successfully connected to broker, subscribing to #");
 			try
 			{
-				mqttc.subscribe("x",0);
+				mqttc.subscribe("#",0);
 				shouldBeConnected=true;
 			}
 			catch(MqttException mqe)
@@ -147,7 +147,7 @@ public class MQTTHandler
 		Main.t.schedule(new StateChecker(),30*1000,30*1000);
 	}
 
-	static public void doPublish(String name, String val, boolean retain,boolean ack)
+	static public void doPublish(String name, String val,boolean retain,boolean ack)
 	{
 		String txtmsg=new JsonObject().add("val",val).add("ack",ack).toString();
 		MqttMessage msg=new MqttMessage(txtmsg.getBytes(Charset.forName("UTF-8")));
