@@ -1,0 +1,13 @@
+language: java
+before_deploy: gradle jar
+deploy:
+  provider: releases
+  api_key:
+    secure: aYM+7BdaxXnLhow9eW+EJ2+yb78oUbk8Q5IMFw8u/czcVwfPr5+ui0YP8ShPfEJs6KahbzixgXSSbXS3XWEGvcgsb9nrj/yN6lxiiMScrGd7MZEdR9UqSsSuYt3go2WUa/2wrG7Oq8UlQ0/CYp8cedwA+ufXFw6yz//7utB5Qns=
+  file: build/libs/logic4mqtt.jar
+  skip_cleanup: true
+  on:
+    repo: mqtt-smarthome/logic4mqtt
+    tags: true
+    all_branches: true
+

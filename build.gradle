@@ -31,7 +31,8 @@ task listJars << {
 
 jar {
 	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    manifest {
+	archiveName 'logic4mqtt.jar'
+	manifest {
         attributes 	'Main-Class': 'com.tellerulam.logic4mqtt.Main',
         			'Implementation-Title': 'logic4mqtt Logic Engine',
                    	'Implementation-Version': version
