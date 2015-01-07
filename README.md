@@ -25,7 +25,7 @@ Dependencies
 * sunrisesunsetlib-java: https://github.com/mikereedell/sunrisesunsetlib-java (for sunrise/sunset calculations)
 * Quartz Scheduler: http://www.quartz-scheduler.org/ (used for cron-alike timer parsing)
 
-[![Build Status](https://travis-ci.org/mqtt-smarthome/logic4mqtt.svg)](https://travis-ci.org/mqtt-smarthome/logic4mqtt)
+[![Build Status](https://travis-ci.org/mqtt-smarthome/logic4mqtt.svg)](https://travis-ci.org/mqtt-smarthome/logic4mqtt) Automatically built jars can be downloaded from the release page on GitHub at https://github.com/mqtt-smarthome/logic4mqtt/releases
 
 
 Events
