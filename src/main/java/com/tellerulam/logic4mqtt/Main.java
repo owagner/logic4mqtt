@@ -1,6 +1,7 @@
 package com.tellerulam.logic4mqtt;
 
 import java.io.*;
+import java.nio.charset.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.logging.*;
@@ -21,7 +22,7 @@ public class Main
 			// Read from build.gradle instead
 			try
 			{
-				List<String> buildFile=Files.readAllLines(Paths.get("build.gradle"));
+				List<String> buildFile=Files.readAllLines(Paths.get("build.gradle"),StandardCharsets.UTF_8);
 				Pattern p=Pattern.compile("version.*=.*'([^']+)");
 				for(String l:buildFile)
 				{
