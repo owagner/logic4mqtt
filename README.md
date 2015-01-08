@@ -91,3 +91,12 @@ of the currently location need to be set with a call to
     
 prior to use.
 
+Changelog
+---------
+* 0.4 - 2015/01/08 - owagner
+  - use one ScriptEngine instance per file suffix, so the complete context is shared among scripts
+  - read version number from jar manifest or build.gradle
+  - redirect script output to java logging, with the log messages being [prefixed] with the script
+    name
+    
+

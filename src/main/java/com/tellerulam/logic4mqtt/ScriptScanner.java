@@ -29,6 +29,26 @@ public class ScriptScanner
 	private static List<LScript> scripts=new ArrayList<>();
 	private static ScriptEngineManager sem=new ScriptEngineManager();
 
+	private static final Map<String,ScriptEngine> engines=new HashMap<>();
+	static private ScriptEngine getEngine(String ext)
+	{
+		ScriptEngine se=engines.get(ext);
+		if(se==null)
+		{
+			se=sem.getEngineByExtension(ext);
+			if(se!=null)
+			{
+				// Configure the engine
+				se.put("Events", Events.getInstance());
+				se.put("Timers", Timers.getInstance());
+				se.put("Utilities", Utilities.getInstance());
+				se.put("SunriseSunset", SunriseSunset.getInstance());
+				engines.put(ext,se);
+			}
+		}
+		return se;
+	}
+
 	static void scanDirectory(File dir)
 	{
 		File[] content=dir.listFiles();
@@ -44,7 +64,7 @@ public class ScriptScanner
 				if(eix>0)
 				{
 					String ext=name.substring(eix+1);
-					ScriptEngine se=sem.getEngineByExtension(ext);
+					ScriptEngine se=getEngine(ext);
 					if(se==null)
 					{
 						L.log(Level.WARNING, "Unable to find a matching script engine for script "+f);
@@ -77,10 +97,9 @@ public class ScriptScanner
 			L.info("Executing "+ls.f+" with "+ls.scriptEngine.getFactory().getEngineName());
 			try
 			{
-				ls.scriptEngine.put("Events", Events.getInstance());
-				ls.scriptEngine.put("Timers", Timers.getInstance());
-				ls.scriptEngine.put("Utilities", Utilities.getInstance());
-				ls.scriptEngine.put("SunriseSunset", SunriseSunset.getInstance());
+				String logPrefix=ls.f.getName();
+				ls.scriptEngine.getContext().setWriter(new LogWriter(Level.INFO,logPrefix));
+				ls.scriptEngine.getContext().setErrorWriter(new LogWriter(Level.WARNING,logPrefix));
 				ls.scriptEngine.eval(new FileReader(ls.f));
 			}
 			catch(FileNotFoundException e)
@@ -93,6 +112,9 @@ public class ScriptScanner
 				System.exit(1);
 			}
 		}
+		/*
+		 * Since we no longer have individual contexts when callbacks are being used, we should reset this
+		 */
 	}
 
 	private static final Logger L=Logger.getLogger(ScriptScanner.class.getName());
