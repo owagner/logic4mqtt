@@ -1,6 +1,7 @@
 package com.tellerulam.logic4mqtt;
 
 import java.io.*;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.logging.*;
 
@@ -78,6 +79,29 @@ public class ScriptScanner
 		}
 	}
 
+	/*
+	 * Rhino: when running, set the setJavaPrimitiveWrap mode to false. Otherwise, primitive types
+	 * returned from Java methods will end up being Javascript general objects, instead of
+	 * Javascript primitive objects like Number, Boolean etc.
+	 *
+	 * Nashorn (the Java 8 successor to Rhino) does not need this hack
+	 */
+	private static void applyRhinoWrapHack()
+	{
+		try
+		{
+			Class<?> wrapFactoryClass=Class.forName("com.sun.script.javascript.RhinoWrapFactory");
+			Method m=wrapFactoryClass.getDeclaredMethod("getInstance");
+			m.setAccessible(true);
+			Object wrapFactoryInstance=m.invoke(null);
+			wrapFactoryInstance.getClass().getMethod("setJavaPrimitiveWrap", boolean.class).invoke(wrapFactoryInstance, Boolean.FALSE);
+		}
+		catch(Exception e)
+		{
+			L.log(Level.WARNING,"Rhino wrap hack failed",e);
+		}
+	}
+
 	static void doScan(String dirName)
 	{
 		// Gather scripts
@@ -98,8 +122,11 @@ public class ScriptScanner
 			try
 			{
 				String logPrefix=ls.f.getName();
-				ls.scriptEngine.getContext().setWriter(new LogWriter(Level.INFO,logPrefix));
-				ls.scriptEngine.getContext().setErrorWriter(new LogWriter(Level.WARNING,logPrefix));
+				if("Rhino".equals(ls.scriptEngine.getFactory().getEngineName()))
+					applyRhinoWrapHack();
+				ScriptContext cx=ls.scriptEngine.getContext();
+				cx.setWriter(new LogWriter(Level.INFO,logPrefix));
+				cx.setErrorWriter(new LogWriter(Level.WARNING,logPrefix));
 				ls.scriptEngine.eval(new FileReader(ls.f));
 			}
 			catch(FileNotFoundException e)
@@ -115,6 +142,11 @@ public class ScriptScanner
 		/*
 		 * Since we no longer have individual contexts when callbacks are being used, we should reset this
 		 */
+		for(ScriptEngine se:engines.values())
+		{
+			se.getContext().setWriter(new LogWriter(Level.INFO,"callback"));
+			se.getContext().setErrorWriter(new LogWriter(Level.WARNING,"callback"));
+		}
 	}
 
 	private static final Logger L=Logger.getLogger(ScriptScanner.class.getName());

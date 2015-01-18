@@ -62,7 +62,7 @@ public class MQTTHandler
 	void processMessage(String topic,MqttMessage msg)
 	{
 		JsonObject data=JsonObject.readFrom(new String(msg.getPayload(),Charset.forName("UTF-8")));
-		L.info("Received "+msg+" to "+topic);
+		L.fine("Received "+msg+" to "+topic);
 		JsonValue val=data.get("val");
 		Object transformedVal;
 		if(val.isNumber())

@@ -5,7 +5,9 @@
 
 package com.tellerulam.logic4mqtt.api;
 
+import java.io.*;
 import java.net.*;
+import java.nio.charset.*;
 import java.util.*;
 import java.util.logging.*;
 
@@ -81,6 +83,95 @@ public class Utilities
 	public void sendWOL(String macSpec)
 	{
 		sendWOL(macSpec,null);
+	}
+
+	/**
+	 * Send a simple, raw network message via TCP or UDP to a given host and port, and
+	 * optionally read a single-line response.
+	 *
+	 * This is intended for simple automation protocols. If you need more flexibility,
+	 * look into the libraries of your scripting language.
+	 *
+	 * Note: The complete script engine will block while waiting timeoutMillis. It is
+	 * recommended to keep the value as low as possible. Do not set it to a value
+	 * higher than zero unless you really need the response.
+	 *
+	 * @param host the host to send the message to. Either an IP address or a hostname.
+	 * @param port the port number (1-65535)
+	 * @param message the payload of the message
+	 * @param udp if true, UDP will be used, TCP otherwise
+	 * @param timeoutMillis amount of time to wait for a response. If 0, we don't wait
+	 * @return the received response, or null if anything went wrong or a timeout occured
+	 */
+	public String sendNetMessage(String host,int port,String message,boolean udp,int timeoutMillis)
+	{
+		String response=null;
+		try
+		{
+			if(udp)
+			{
+				DatagramSocket s=new DatagramSocket();
+				byte payload[]=message.getBytes(StandardCharsets.UTF_8);
+				DatagramPacket p=new DatagramPacket(payload,payload.length);
+				s.connect(InetAddress.getByName(host), port);
+				s.send(p);
+				if(timeoutMillis!=0)
+				{
+					s.setSoTimeout(timeoutMillis);
+					s.receive(p);
+					response=new String(p.getData(),StandardCharsets.UTF_8);
+				}
+				s.close();
+			}
+			else
+			{
+				Socket s=new Socket(host,port);
+				s.getOutputStream().write(message.getBytes(StandardCharsets.UTF_8));
+				if(timeoutMillis!=0)
+				{
+					s.setSoTimeout(timeoutMillis);
+					BufferedReader br=new BufferedReader(new InputStreamReader(s.getInputStream(),StandardCharsets.UTF_8));
+					response=br.readLine();
+				}
+				s.close();
+			}
+		}
+		catch(Exception e)
+		{
+			L.log(Level.WARNING,"sendNetMessage("+host+","+port+","+message+","+udp+","+timeoutMillis+") failed",e);
+		}
+		return response;
+	}
+
+	/**
+	 * Send a simple, raw network message via TCP or UDP to a given host and port.
+	 *
+	 * This is intended for simple automation protocols. If you need more flexibility,
+	 * look into the libraries of your scripting language.
+	 *
+	 * @param host the host to send the message to. Either an IP address or a hostname.
+	 * @param port the port number (1-65535)
+	 * @param message the payload of the message
+	 * @param udp if true, UDP will be used, TCP otherwise
+	 */
+	public void sendNetMessage(String host,int port,String message,boolean udp)
+	{
+		sendNetMessage(host,port,message,udp,0);
+	}
+
+	/**
+	 * Send a simple, raw network message via TCP to a given host and port.
+	 *
+	 * This is intended for simple automation protocols. If you need more flexibility,
+	 * look into the libraries of your scripting language.
+	 *
+	 * @param host the host to send the message to. Either an IP address or a hostname.
+	 * @param port the port number (1-65535)
+	 * @param message the payload of the message
+	 */
+	public void sendNetMessage(String host,int port,String message)
+	{
+		sendNetMessage(host,port,message,false,0);
 	}
 
 	private static Logger L=Logger.getLogger(Utilities.class.getName());

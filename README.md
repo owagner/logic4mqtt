@@ -98,5 +98,11 @@ Changelog
   - read version number from jar manifest or build.gradle
   - redirect script output to java logging, with the log messages being [prefixed] with the script
     name
-    
+* 0.5 - 2015/01/18 - owagner
+  - API: added Utilites.sendNetMessage() function for doing very simple network communication
+  - when running Rhino, explicitely set setJavaPrimitiveWrap(false). Otherwise, primitive types returned
+    from Java methods like Events.getValue() end up being Javascript Object instead of primitive
+    instances
+  - reset log prefix to [callback] when initial script runs have finished
+  
 
