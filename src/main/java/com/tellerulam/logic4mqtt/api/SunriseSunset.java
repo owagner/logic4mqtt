@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.logging.*;
 
 import com.luckycatlabs.sunrisesunset.*;
+import com.luckycatlabs.sunrisesunset.calculator.*;
 import com.luckycatlabs.sunrisesunset.dto.*;
 
 public class SunriseSunset
@@ -19,14 +20,14 @@ public class SunriseSunset
 	private static final SunriseSunset instance=new SunriseSunset();
 
 	private Location location;
-	private SunriseSunsetCalculator sscalc;
+	private SolarEventCalculator sscalc;
 
-	private synchronized SunriseSunsetCalculator getCalculator()
+	private synchronized SolarEventCalculator getCalculator()
 	{
 		if(location==null)
 			location=new Location("51.358813","7.241483");
 		if(sscalc==null)
-			sscalc=new SunriseSunsetCalculator(location,TimeZone.getDefault());
+			sscalc=new SolarEventCalculator(location,TimeZone.getDefault());
 		return sscalc;
 	}
 
@@ -42,37 +43,174 @@ public class SunriseSunset
 		sscalc=null;
 	}
 
+	private Zenith getZenith(String name)
+	{
+		if(name==null || "OFFICIAL".equalsIgnoreCase(name))
+			return Zenith.OFFICIAL;
+		else if("ASTRONOMICAL".equalsIgnoreCase(name))
+			return Zenith.ASTRONOMICAL;
+		else if("NAUTICAL".equalsIgnoreCase(name))
+			return Zenith.NAUTICAL;
+		else if("CIVIL".equalsIgnoreCase(name))
+			return Zenith.CIVIL;
+		throw new IllegalArgumentException("Unknown zenith "+name);
+	}
+
+	/**
+	 * Get the Sunrise time (format hh:mm) for the given Zentih
+	 *
+	 * @param zenith OFFICIAL (or null) / ASTRONOMICAL / NAUTICAL / CIVIL
+	 * @return the sunrise time
+	 */
+	public String getSunrise(String zenith)
+	{
+		return getCalculator().computeSunriseTime(getZenith(zenith), Calendar.getInstance());
+	}
+	/**
+	 * Get the Sunset time (format hh:mm) for the given Zentih
+	 *
+	 * @param zenith OFFICIAL (or null) / ASTRONOMICAL / NAUTICAL / CIVIL
+	 * @return the sunrise time
+	 */
+	public String getSunset(String zenith)
+	{
+		return getCalculator().computeSunsetTime(getZenith(zenith), Calendar.getInstance());
+	}
+
+	/**
+	 * Shortcut for getSunrise() with the given zenith
+	 * @return the sunrise time
+	 *
+	 * @see getSunrise
+	 */
 	public String getAstronomicalSunrise()
 	{
-		return getCalculator().getAstronomicalSunriseForDate(Calendar.getInstance());
+		return getSunrise("ASTRONOMICAL");
 	}
+	/**
+	 * Shortcut for getSunset() with the given zenith
+	 * @return the sunset time
+	 *
+	 * @see getSunset
+	 */
 	public String getAstronomicalSunset()
 	{
-		return getCalculator().getAstronomicalSunsetForDate(Calendar.getInstance());
+		return getSunset("ASTRONOMICAL");
 	}
+
+	/**
+	 * Shortcut for getSunrise() with the given zenith
+	 * @return the sunrise time
+	 *
+	 * @see getSunrise
+	 */
 	public String getNauticalSunrise()
 	{
-		return getCalculator().getNauticalSunriseForDate(Calendar.getInstance());
+		return getSunrise("NAUTICAL");
 	}
+	/**
+	 * Shortcut for getSunset() with the given zenith
+	 * @return the sunset time
+	 *
+	 * @see getSunset
+	 */
 	public String getNauticalSunset()
 	{
-		return getCalculator().getNauticalSunsetForDate(Calendar.getInstance());
+		return getSunset("NAUTICAL");
 	}
+
+	/**
+	 * Shortcut for getSunrise() with the given zenith
+	 * @return the sunrise time
+	 *
+	 * @see getSunrise
+	 */
 	public String getCivilSunrise()
 	{
-		return getCalculator().getCivilSunriseForDate(Calendar.getInstance());
+		return getSunrise("CIVIL");
 	}
+	/**
+	 * Shortcut for getSunset() with the given zenith
+	 * @return the sunset time
+	 *
+	 * @see getSunset
+	 */
 	public String getCivilSunset()
 	{
-		return getCalculator().getCivilSunsetForDate(Calendar.getInstance());
+		return getSunset("CIVIL");
 	}
+
+	/**
+	 * Shortcut for getSunrise() with the given zenith
+	 * @return the sunrise time
+	 *
+	 * @see getSunrise
+	 */
 	public String getOfficialSunrise()
 	{
-		return getCalculator().getOfficialSunriseForDate(Calendar.getInstance());
+		return getSunrise(null);
 	}
+	/**
+	 * Shortcut for getSunset() with the given zenith
+	 * @return the sunset time
+	 *
+	 * @see getSunset
+	 */
 	public String getOfficialSunset()
 	{
-		return getCalculator().getOfficialSunsetForDate(Calendar.getInstance());
+		return getSunset(null);
+	}
+
+	/**
+	 * Determine whether we're currently having daylight according to the given zenith
+	 *
+	 * @param zenith
+	 * @return whether it is currently daylight
+	 */
+
+	public boolean isDaylight(String zenith)
+	{
+		Calendar now=Calendar.getInstance();
+		Zenith z=getZenith(zenith);
+		Calendar sunrise=getCalculator().computeSunriseCalendar(z, now);
+		Calendar sunset=getCalculator().computeSunsetCalendar(z, now);
+		return(now.compareTo(sunrise)>0 && now.compareTo(sunset)<0);
+	}
+
+	/**
+	 * Shortcut to isDaylight() with the given zenith
+	 * @return whether it is currently daylight
+	 */
+	public boolean isCivilDaylight()
+	{
+		return isDaylight("CIVIL");
+	}
+
+	/**
+	 * Shortcut to isDaylight() with the given zenith
+	 * @return whether it is currently daylight
+	 */
+	public boolean isNauticalDaylight()
+	{
+		return isDaylight("NAUTICAL");
+	}
+
+	/**
+	 * Shortcut to isDaylight() with the given zenith
+	 * @return whether it is currently daylight
+	 */
+	public boolean isAstronomicalDaylight()
+	{
+		return isDaylight("ASTRONOMICAL");
+	}
+
+	/**
+	 * Shortcut to isDaylight() with the given zenith
+	 * @return whether it is currently daylight
+	 */
+	public boolean isOfficial()
+	{
+		return isDaylight(null);
 	}
 
 	public static SunriseSunset getInstance()

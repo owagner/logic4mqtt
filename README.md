@@ -102,6 +102,10 @@ Changelog
   - now skips common backup suffixes when looking for scripts to execute (right now, "~" and ".bak")
   - when publishing to MQTT, round numbers to 8 decimal digits, and try to avoid a decimal point
     alltogether for integers. Also, convert Booleans to 0/1.
+  - API: SunriseSunset now has getSunrise() and getSunset() methods which accept a string denoting
+    the required Zenith (OFFICIAL, ASTRONOMICAL, NAUTICAL and CIVIL)
+  - API: added SunriseSunset.isDaylight() and variants to quickly check whether it's currently
+    between sunrise and sunset for the given Zenith
 
 * 0.5 - 2015/01/18 - owagner
   - API: added Utilites.sendNetMessage() function for doing very simple network communication
