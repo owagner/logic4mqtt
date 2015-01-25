@@ -52,7 +52,22 @@ public class ScriptScanner
 
 	static void scanDirectory(File dir)
 	{
-		File[] content=dir.listFiles();
+		/* Ignore files ending with common backup suffixes */
+		File[] content=dir.listFiles(new FileFilter(){
+			final String backupSuffixes[]={
+				"~",
+				".bak"
+			};
+			@Override
+			public boolean accept(File f)
+			{
+				String name=f.getName();
+				for(String bs:backupSuffixes)
+					if(name.endsWith(bs))
+						return false;
+				return true;
+			}
+		});
 		for(File f:content)
 		{
 			if(f.isDirectory())
@@ -68,7 +83,7 @@ public class ScriptScanner
 					ScriptEngine se=getEngine(ext);
 					if(se==null)
 					{
-						L.log(Level.WARNING, "Unable to find a matching script engine for script "+f);
+						L.log(Level.WARNING, "Unable to find a matching script engine for script "+f+" [ext: "+ext+"]");
 					}
 					else
 					{

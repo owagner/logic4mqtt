@@ -30,6 +30,7 @@ public class Events
 	 */
 	public int onChangeTo(String topicPattern,Object value,EventCallbackInterface callback)
 	{
+		topicPattern=TopicCache.convertStatusTopic(topicPattern);
 		return EventHandler.createNewHandler(topicPattern, new Object[]{value}, true, callback);
 	}
 	/**
@@ -43,6 +44,7 @@ public class Events
 	 */
 	public int onChangeTo(String topicPattern,Object values[],EventCallbackInterface callback)
 	{
+		topicPattern=TopicCache.convertStatusTopic(topicPattern);
 		return EventHandler.createNewHandler(topicPattern, values, true, callback);
 	}
 	/**
@@ -55,6 +57,7 @@ public class Events
 	 */
 	public int onChange(String topicPattern,EventCallbackInterface callback)
 	{
+		topicPattern=TopicCache.convertStatusTopic(topicPattern);
 		return EventHandler.createNewHandler(topicPattern, null, true, callback);
 	}
 	/**
@@ -67,6 +70,7 @@ public class Events
 	 */
 	public int onUpdate(String topicPattern,EventCallbackInterface callback)
 	{
+		topicPattern=TopicCache.convertStatusTopic(topicPattern);
 		return EventHandler.createNewHandler(topicPattern, null, false, callback);
 	}
 	/**
@@ -82,20 +86,20 @@ public class Events
 
 	/**
 	 *
-	 * Publish an update to the specified topic with the given value. It will not be retained,
-	 * and not have the ack flag set.
+	 * Publish an update to the specified topic with the given value. It will not be retained.
 	 *
 	 * @param topic
 	 * @param value
 	 */
 	public void setValue(String topic,Object value)
 	{
-		MQTTHandler.doPublish(topic, value.toString(), false, false);
+		topic=TopicCache.convertSetTopic(topic);
+		MQTTHandler.doPublish(topic, value, false );
 	}
 
 	/**
 	 * Queue an update to the specified topic with the given value at timespec.
-
+	 *
 	 * This is effectivly a shortcut for adding a timer which sets the value,
 	 * with a symbolic name of _SET_<topic>
 	 *
@@ -105,13 +109,14 @@ public class Events
 	 *
 	 * @see Timers
 	 */
-	public void queueValue(String timespec,final String topic,final Object value)
+	public void queueValue(String timespec,String topic,final Object value)
 	{
-		LogicTimer.addTimer("_SET_"+topic, timespec, new TimerCallbackInterface(){
+		final String setTopic=TopicCache.convertSetTopic(topic);
+		LogicTimer.addTimer("_SET_"+setTopic, timespec, new TimerCallbackInterface(){
 			@Override
 			public void run(Object userdata)
 			{
-				MQTTHandler.doPublish(topic, value.toString(), false, false);
+				MQTTHandler.doPublish(setTopic, value, false );
 			}
 		},null);
 	}
@@ -124,7 +129,7 @@ public class Events
 	 */
 	public int clearQueue(String topic)
 	{
-		return LogicTimer.remTimer("_SET_"+topic);
+		return LogicTimer.remTimer("_SET_"+TopicCache.convertSetTopic(topic));
 	}
 
 	/**
@@ -138,6 +143,7 @@ public class Events
 	 */
 	public Object getValue(String topic,int generation)
 	{
+		topic=TopicCache.convertStatusTopic(topic);
 		TopicValue tv=TopicCache.getTopicValue(topic, generation);
 		if(tv!=null)
 			return tv.value;
@@ -165,6 +171,7 @@ public class Events
 	 */
 	public Date getTimestamp(String topic,int generation)
 	{
+		topic=TopicCache.convertStatusTopic(topic);
 		TopicValue tv=TopicCache.getTopicValue(topic, generation);
 		if(tv!=null)
 			return tv.ts;

@@ -11,6 +11,37 @@ public class TopicCache
 {
 	static final Map<String,TopicCache> topics=new HashMap<>();
 
+	/**
+	 * Replaces the // notation into /status/ and /set/ respectivly
+	 * @param inputTopic
+	 * @return new topic, with possible // replaced
+	 */
+
+	public static String convertSetTopic(String inputTopic)
+	{
+		return convertTopic(inputTopic,"set");
+	}
+
+	public static String convertStatusTopic(String inputTopic)
+	{
+		return convertTopic(inputTopic,"status");
+	}
+
+	private static String convertTopic(String inputTopic,String replacement)
+	{
+		int slashIx=inputTopic.indexOf('/');
+		if(slashIx<0)
+			return inputTopic;
+		if(inputTopic.length()==slashIx+1)
+			return inputTopic;
+		if(inputTopic.charAt(slashIx+1)=='/')
+		{
+			// Found // notation
+			return inputTopic.substring(0,slashIx+1)+replacement+inputTopic.substring(slashIx+1);
+		}
+		return inputTopic;
+	}
+
 	static TopicCache storeTopic(String topic,Object newValue)
 	{
 		synchronized(topics)

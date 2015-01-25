@@ -1,6 +1,7 @@
 package com.tellerulam.logic4mqtt;
 
 import java.nio.charset.*;
+import java.text.*;
 import java.util.*;
 import java.util.logging.*;
 
@@ -59,22 +60,71 @@ public class MQTTHandler
 
 	private boolean shouldBeConnected;
 
+	private Object convertStringToObject(String val)
+	{
+		// Try double?
+		if(val.indexOf('.')>=0)
+		{
+			try
+			{
+				return Double.valueOf(val);
+			}
+			catch(NumberFormatException nfe)
+			{
+				// Ok, not a double, can't be an Integer, can't be true/false, treat as String
+				return val;
+			}
+		}
+		// TODO: do we really want to do that?
+		if("true".equalsIgnoreCase(val))
+			return Boolean.TRUE;
+		if("false".equalsIgnoreCase(val))
+			return Boolean.FALSE;
+		// Try Integer
+		try
+		{
+			return Integer.valueOf(val);
+		}
+		catch(NumberFormatException nfe2)
+		{
+			// Not an Integer; maybe a Double in scientific notation without a decimal point?
+			try
+			{
+				return Double.valueOf(val);
+			}
+			catch(NumberFormatException nfe3)
+			{
+				// String it is, then
+				return val;
+			}
+		}
+	}
+
 	void processMessage(String topic,MqttMessage msg)
 	{
-		JsonObject data=JsonObject.readFrom(new String(msg.getPayload(),Charset.forName("UTF-8")));
 		L.fine("Received "+msg+" to "+topic);
-		JsonValue val=data.get("val");
+
+		// Determine whether the payload is JSON encoded or not
+		String payload=new String(msg.getPayload(),StandardCharsets.UTF_8);
 		Object transformedVal;
-		if(val.isNumber())
-			transformedVal=Double.valueOf(val.asDouble());
-		else if(val.isString())
-			transformedVal=val.asString();
-		else if(val.isBoolean())
-			transformedVal=Integer.valueOf(val.asBoolean()?1:0);
-		else if(val.isNull())
-			transformedVal=null;
+
+		if(payload.trim().startsWith("{"))
+		{
+			JsonObject data=JsonObject.readFrom(payload);
+			JsonValue val=data.get("val");
+			if(val.isNumber())
+				transformedVal=Double.valueOf(val.asDouble());
+			else if(val.isString())
+				transformedVal=val.asString();
+			else if(val.isBoolean())
+				transformedVal=Integer.valueOf(val.asBoolean()?1:0);
+			else if(val.isNull())
+				transformedVal=null;
+			else
+				transformedVal=val.toString();
+		}
 		else
-			transformedVal=val.toString();
+			transformedVal=convertStringToObject(payload);
 
 		TopicCache t=TopicCache.storeTopic(topic,transformedVal);
 		// If this is a retained message, do not dispatch an event
@@ -88,12 +138,12 @@ public class MQTTHandler
 		L.info("Connecting to MQTT broker "+mqttc.getServerURI()+" with CLIENTID="+mqttc.getClientId()+" and status TOPIC PREFIX="+topicPrefix);
 
 		MqttConnectOptions copts=new MqttConnectOptions();
-		copts.setWill(topicPrefix+"connected", "{ \"val\": false, \"ack\": true }".getBytes(), 1, true);
+		copts.setWill(topicPrefix+"connected", "0".getBytes(), 2, true);
 		copts.setCleanSession(true);
 		try
 		{
 			mqttc.connect(copts);
-			mqttc.publish(topicPrefix+"connected", "{ \"val\": true, \"ack\": true }".getBytes(), 1, true);
+			mqttc.publish(topicPrefix+"connected", "2".getBytes(), 1, true);
 			L.info("Successfully connected to broker, subscribing to #");
 			try
 			{
@@ -147,11 +197,35 @@ public class MQTTHandler
 		Main.t.schedule(new StateChecker(),30*1000,30*1000);
 	}
 
-	static public void doPublish(String name, String val,boolean retain,boolean ack)
+	/**
+	 * Publish a plain message (not JSON encoded)
+	 * @param name
+	 * @param val
+	 * @param retain
+	 */
+	static public void doPublish(String name, Object val,boolean retain)
 	{
-		String txtmsg=new JsonObject().add("val",val).add("ack",ack).toString();
-		MqttMessage msg=new MqttMessage(txtmsg.getBytes(Charset.forName("UTF-8")));
-		// Default QoS is 1, which is what we want
+		String valstr=convertValue(val);
+		MqttMessage msg=new MqttMessage(valstr.getBytes(StandardCharsets.UTF_8));
+		msg.setQos(0);
+		msg.setRetained(retain);
+		try
+		{
+			instance.mqttc.publish(name, msg);
+			instance.L.info("Published "+valstr+" to "+name);
+		}
+		catch(MqttException e)
+		{
+			instance.L.log(Level.WARNING,"Error when publishing message",e);
+		}
+	}
+
+	/*
+	static public void doPublishJSON(String name, Object val,boolean retain)
+	{
+		String txtmsg=new JsonObject().add("val",val).toString();
+		MqttMessage msg=new MqttMessage(txtmsg.getBytes(StandardCharsets.UTF_8));
+		msg.setQos(0);
 		msg.setRetained(retain);
 		try
 		{
@@ -163,6 +237,36 @@ public class MQTTHandler
 			instance.L.log(Level.WARNING,"Error when publishing message",e);
 		}
 	}
+	*/
 
+	/**
+	 *
+	 * If the script engine used is Javascript, we end up with all numbers being Doubles.
+	 * We really only want to produce a decimal point on the MQTT bus if it's really necessary,
+	 * though.
+	 *
+	 * @param val
+	 * @return
+	 */
+	private static final DecimalFormat df_mqtt_bus=new DecimalFormat("0.########",new DecimalFormatSymbols(Locale.US));
+	public static String convertValue(Object val)
+	{
+		if(val instanceof Number)
+		{
+			synchronized(df_mqtt_bus)
+			{
+				return df_mqtt_bus.format(val);
+			}
+		}
+		else if(val instanceof Boolean)
+		{
+			// Convert Boolean into 0/1
+			if(((Boolean)val).booleanValue())
+				return "1";
+			else
+				return "0";
+		}
+		return val.toString();
+	}
 
 }

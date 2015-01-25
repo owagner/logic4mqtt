@@ -93,16 +93,27 @@ prior to use.
 
 Changelog
 ---------
-* 0.4 - 2015/01/08 - owagner
-  - use one ScriptEngine instance per file suffix, so the complete context is shared among scripts
-  - read version number from jar manifest or build.gradle
-  - redirect script output to java logging, with the log messages being [prefixed] with the script
-    name
+* 0.6 - 2015/01/25 - owagner
+  - adapted to new mqtt-smarthome topic hierarchy scheme: /status/ for reports, /set/ for setting values.
+    A special notation is supported -- if the first topic part is suffixed with "//", it gets
+    replaced with /set/ and /status/ depending on context. For example, an event handler set
+    to "knx//kitchen/light" gets to be actually set to "knx/status/kitchen/light", whereas
+    a Event.setValue("knx//kitchen/light"...) will set "knx/set/kitchen/light"
+  - now skips common backup suffixes when looking for scripts to execute (right now, "~" and ".bak")
+  - when publishing to MQTT, round numbers to 8 decimal digits, and try to avoid a decimal point
+    alltogether for integers. Also, convert Booleans to 0/1.
+
 * 0.5 - 2015/01/18 - owagner
   - API: added Utilites.sendNetMessage() function for doing very simple network communication
   - when running Rhino, explicitely set setJavaPrimitiveWrap(false). Otherwise, primitive types returned
     from Java methods like Events.getValue() end up being Javascript Object instead of primitive
     instances
   - reset log prefix to [callback] when initial script runs have finished
+
+* 0.4 - 2015/01/08 - owagner
+  - use one ScriptEngine instance per file suffix, so the complete context is shared among scripts
+  - read version number from jar manifest or build.gradle
+  - redirect script output to java logging, with the log messages being [prefixed] with the script
+    name
   
 
