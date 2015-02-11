@@ -7,7 +7,7 @@ deploy:
   file: build/libs/logic4mqtt.jar
   skip_cleanup: true
   on:
-    repo: mqtt-smarthome/logic4mqtt
+    repo: owagner/logic4mqtt
     tags: true
     all_branches: true
 
