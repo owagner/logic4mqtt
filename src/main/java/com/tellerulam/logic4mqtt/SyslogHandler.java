@@ -73,10 +73,11 @@ public class SyslogHandler extends Handler
 		levels.put(Level.FINEST,7);
 	}
 
-	private static final String monthNames[]={"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-
 	private void sendSyslogMessage(StringBuilder msg)
 	{
+		if(ds==null)
+			return;
+
 		byte msgData[]=msg.toString().getBytes(StandardCharsets.US_ASCII);
 		try
 		{
@@ -105,11 +106,9 @@ public class SyslogHandler extends Handler
 		StringBuilder m=new StringBuilder();
 		m.append('<');
 		m.append(facility*8+pri);
-		m.append(">");
-		m.append(monthNames[cal.get(Calendar.MONTH)]);
-		m.append(' ');
-		Formatter dateFormatter=new Formatter(m);
-		dateFormatter.format("%2d %TT",cal.get(Calendar.DAY_OF_MONTH),cal);
+		m.append("> ");
+		Formatter dateFormatter=new Formatter(m,Locale.US);
+		dateFormatter.format("%1$tb %2$2d %1$TT",cal,cal.get(Calendar.DAY_OF_MONTH));
 		dateFormatter.close();
 		m.append(" ");
 		m.append(hostname);
