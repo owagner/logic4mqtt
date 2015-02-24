@@ -25,8 +25,8 @@ public class SyslogHandler extends Handler
 	public SyslogHandler() throws SocketException, UnknownHostException
 	{
 		ds=new DatagramSocket();
-		String syslogHost=LogManager.getLogManager().getProperty("com.tellerulam.syslog.host");
-		String syslogPort=LogManager.getLogManager().getProperty("com.tellerulam.syslog.port");
+		String syslogHost=LogManager.getLogManager().getProperty(getClass().getName()+".host");
+		String syslogPort=LogManager.getLogManager().getProperty(getClass().getName()+".port");
 		ds.connect(new InetSocketAddress(
 			syslogHost!=null?syslogHost:"localhost",
 			syslogPort!=null?Integer.parseInt(syslogPort):514
