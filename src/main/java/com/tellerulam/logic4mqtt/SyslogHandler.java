@@ -53,7 +53,8 @@ public class SyslogHandler extends Handler
 	@Override
 	public void close() throws SecurityException
 	{
-		ds.close();
+		if(ds!=null)
+			ds.close();
 	}
 
 	@Override
