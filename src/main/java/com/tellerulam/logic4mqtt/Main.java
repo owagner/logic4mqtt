@@ -39,7 +39,7 @@ public class Main
 		return version;
 	}
 
-	public static void main(String[] args) throws MqttException
+	public static void main(String[] args) throws MqttException, SecurityException, IOException
 	{
 		/*
 		 * Interpret all command line arguments as property definitions (without the hm2mqtt prefix)
@@ -54,6 +54,7 @@ public class Main
 			}
 			System.setProperty("logic4mqtt."+sp[0],sp[1]);
 		}
+		SyslogHandler.readConfig();
 		Logger.getLogger(Main.class.getName()).info("logic4mqtt V"+getVersion()+" (C) 2015 Oliver Wagner <owagner@tellerulam.com>");
 		MQTTHandler.init();
 		String scriptDirs=System.getProperty("logic4mqtt.scripts.dir","scripts");
