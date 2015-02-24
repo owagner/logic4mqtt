@@ -258,7 +258,7 @@ public class Time
 	 * @param timespec A time in "hh:mm" or "hh:mm:ss" format
 	 * @return whether current time is past the specified time
 	 */
-	public boolean isPast(String timespec)
+	public boolean isAfter(String timespec)
 	{
 		Calendar cal=parseTimeSpec(timespec);
 		return getNow().after(cal);

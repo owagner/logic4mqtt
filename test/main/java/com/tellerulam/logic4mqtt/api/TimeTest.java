@@ -24,8 +24,8 @@ public class TimeTest
 
 		assertTrue(t.isBefore("15:00"));
 		assertFalse(t.isBefore("14:00"));
-		assertTrue(t.isPast("5:00"));
-		assertFalse(t.isPast("14:25:11"));
+		assertTrue(t.isAfter("5:00"));
+		assertFalse(t.isAfter("14:25:11"));
 		assertTrue(t.isBetween("12:00:55", "20:00"));
 		assertFalse(t.isBetween("12:00","14:11:11"));
 	}

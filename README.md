@@ -125,7 +125,7 @@ Changelog
 ---------
 * 0.7 - 2015/02/23 - owagner
   - API: renamed the SunriseSunset object to "Time"
-  - API: added Time.isBefore(), Time.asAfter() and Time.isBetween()
+  - API: added Time.isBefore(), Time.isAfter() and Time.isBetween()
   - API: added Utilities.executeCommand(cmd)
   - API: added Events.storeValue() and Events.queueStore(), which complement .setValue() and .queueValue()
     respectivly, but cause the "retain" flag of the published message to be set. This is mainly intended to
