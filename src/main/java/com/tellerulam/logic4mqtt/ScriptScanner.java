@@ -43,7 +43,7 @@ public class ScriptScanner
 				se.put("Events", Events.getInstance());
 				se.put("Timers", Timers.getInstance());
 				se.put("Utilities", Utilities.getInstance());
-				se.put("SunriseSunset", SunriseSunset.getInstance());
+				se.put("Time", Time.getInstance());
 				engines.put(ext,se);
 			}
 		}

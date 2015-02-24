@@ -94,7 +94,19 @@ public class Events
 	public void setValue(String topic,Object value)
 	{
 		topic=TopicCache.convertSetTopic(topic);
-		MQTTHandler.doPublish(topic, value, false );
+		MQTTHandler.doPublish(topic, value, false);
+	}
+
+	/**
+	 * Publish an update to the specified topic with the given value. It will be retained.
+	 *
+	 * @param topic
+	 * @param value
+	 */
+	public void storeValue(String topic,Object value)
+	{
+		topic=TopicCache.convertSetTopic(topic);
+		MQTTHandler.doPublish(topic, value, true);
 	}
 
 	/**
@@ -116,10 +128,36 @@ public class Events
 			@Override
 			public void run(Object userdata)
 			{
-				MQTTHandler.doPublish(setTopic, value, false );
+				MQTTHandler.doPublish(setTopic, value, false);
 			}
 		},null);
 	}
+
+	/**
+	 * Queue an update to the specified topic with the given value at timespec,
+	 * with the retain flag set to true.
+	 *
+	 * This is effectivly a shortcut for adding a timer which sets the value,
+	 * with a symbolic name of _SET_<topic>
+	 *
+	 * @param timespec the timer spec
+	 * @param topic the topic to publish to
+	 * @param value the value to publish
+	 *
+	 * @see Timers
+	 */
+	public void queueStore(String timespec,String topic,final Object value)
+	{
+		final String setTopic=TopicCache.convertSetTopic(topic);
+		LogicTimer.addTimer("_SET_"+setTopic, timespec, new TimerCallbackInterface(){
+			@Override
+			public void run(Object userdata)
+			{
+				MQTTHandler.doPublish(setTopic, value, true);
+			}
+		},null);
+	}
+
 
 	/**
 	 * Clears possibly queued value sets for the given topic

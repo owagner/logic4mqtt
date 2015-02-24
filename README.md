@@ -13,7 +13,7 @@ message bus.
 It uses Java's generalized scripting interface (JSR-223) so scripts can be implemented in any
 script language supported by this interface. By default, the JVM ships with a Javascript scripting
 engine (Rhino with Java 7, Nashorn with Java 8), but a variety of other interfaces is available
-for languages like Groovy, Jython etc.
+for languages like Groovy, Jython and others.
 
 
 Dependencies
@@ -26,6 +26,36 @@ Dependencies
 * Quartz Scheduler: http://www.quartz-scheduler.org/ (used for cron-alike timer parsing)
 
 [![Build Status](https://travis-ci.org/mqtt-smarthome/logic4mqtt.svg)](https://travis-ci.org/mqtt-smarthome/logic4mqtt) Automatically built jars can be downloaded from the release page on GitHub at https://github.com/mqtt-smarthome/logic4mqtt/releases
+
+
+Topic notation
+--------------
+Various logic4mqtt functions deal with MQTT topics. To simplify topic usage in accordance with the MQTT-smarthome specification, 
+there are some special constructs which are replaced depending on contexts:
+
+  - When setting values, a "//" gets replaced with "/set/"
+  - When getting values, a "//" gets replaced with "/status/"
+  - A "$" prefix gets replaced with the configured logic4mqtt own topic prefix, with "/status/" added.
+    This is intended to faciliate global state variables. 
+
+Example:
+
+	Events.setValue("knx//Floor/Livingroom/Light One",true)
+	
+publishes the value "1" to `knx/set/Floor/Livingroom/Light One`
+whereas 
+
+	Events.getValue("knx//Floor/Livingroom/Light One")
+	
+returns the value of the topic `knx/status/Floor/Livingroom/Light One`
+
+	Events.storeValue("$Status Lighting",1)
+
+and
+
+	Events.getValue("$Status Lighting")
+	
+however both reference `logic/status/Stauts Lighting`
 
 
 Events
@@ -87,12 +117,22 @@ replacement keywords. The sunset/sundown keywords may optionally be prefixed wit
 "astronomical" or "official", to refer to variants of the sunset/sundown times. The latitude and longitude
 of the currently location need to be set with a call to
 
-    SunriseSunset.setLocation(latitude,longitude)
+    Time.setLocation(latitude,longitude)
     
 prior to use.
 
 Changelog
 ---------
+* 0.7 - 2015/02/23 - owagner
+  - API: renamed the SunriseSunset object to "Time"
+  - API: added Time.isBefore(), Time.asAfter() and Time.isBetween()
+  - API: added Utilities.executeCommand(cmd)
+  - API: added Events.storeValue() and Events.queueStore(), which complement .setValue() and .queueValue()
+    respectivly, but cause the "retain" flag of the published message to be set. This is mainly intended to
+    be used with global variables.
+  - API: A "$" topic prefix gets replaced with the configured logic4mqtt own topic prefix, with "/status/" added.
+    This is intended to faciliate global state variables. 
+  
 * 0.6 - 2015/01/25 - owagner
   - adapted to new mqtt-smarthome topic hierarchy scheme: /status/ for reports, /set/ for setting values.
     A special notation is supported -- if the first topic part is suffixed with "//", it gets

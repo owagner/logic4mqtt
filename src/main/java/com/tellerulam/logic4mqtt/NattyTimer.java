@@ -53,7 +53,7 @@ public class NattyTimer extends LogicTimer
 				char type='o';
 				if(m.group(1)!=null)
 					type=m.group(1).charAt(0);
-				SunriseSunset ss=SunriseSunset.getInstance();
+				Time ss=Time.getInstance();
 				switch(type)
 				{
 					case 'c':

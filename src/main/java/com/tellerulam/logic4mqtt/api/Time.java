@@ -10,14 +10,15 @@ package com.tellerulam.logic4mqtt.api;
 
 import java.util.*;
 import java.util.logging.*;
+import java.util.regex.*;
 
 import com.luckycatlabs.sunrisesunset.*;
 import com.luckycatlabs.sunrisesunset.calculator.*;
 import com.luckycatlabs.sunrisesunset.dto.*;
 
-public class SunriseSunset
+public class Time
 {
-	private static final SunriseSunset instance=new SunriseSunset();
+	private static final Time instance=new Time();
 
 	private Location location;
 	private SolarEventCalculator sscalc;
@@ -41,6 +42,7 @@ public class SunriseSunset
 	{
 		location=new Location(latitude,longitude);
 		sscalc=null;
+		L.config("Set location for sunset calculations to "+location);
 	}
 
 	private Zenith getZenith(String name)
@@ -213,10 +215,76 @@ public class SunriseSunset
 		return isDaylight(null);
 	}
 
-	public static SunriseSunset getInstance()
+	private final Pattern timeSpecPattern=Pattern.compile("([0-9]{1,2}):([0-9]{1,2})(?:\\:([0-9]{1,2}))?");
+	private Calendar parseTimeSpec(String timespec)
+	{
+		Calendar cal=Calendar.getInstance();
+		Matcher m=timeSpecPattern.matcher(timespec);
+		if(!m.matches())
+			throw new IllegalArgumentException("Invalid time specification "+timespec);
+		cal.set(Calendar.HOUR_OF_DAY,Integer.parseInt(m.group(1)));
+		cal.set(Calendar.MINUTE,Integer.parseInt(m.group(2)));
+		if(m.group(3)!=null)
+			cal.set(Calendar.SECOND,Integer.parseInt(m.group(3)));
+		else
+			cal.set(Calendar.SECOND,0);
+		cal.set(Calendar.MILLISECOND,0);
+		return cal;
+	}
+
+	protected static Calendar fixedNow; // Test only!
+	private Calendar getNow()
+	{
+		if(fixedNow!=null)
+			return (Calendar)fixedNow.clone();
+		return Calendar.getInstance();
+	}
+
+	/**
+	 * Check whether current time is before the specified time.
+	 *
+	 * @param timespec A time in "hh:mm" or "hh:mm:ss" format
+	 * @return whether current time is before the specified time
+	 */
+	public boolean isBefore(String timespec)
+	{
+		Calendar cal=parseTimeSpec(timespec);
+		return getNow().before(cal);
+	}
+
+	/**
+	 * Check whether current time is past the specified time.
+	 *
+	 * @param timespec A time in "hh:mm" or "hh:mm:ss" format
+	 * @return whether current time is past the specified time
+	 */
+	public boolean isPast(String timespec)
+	{
+		Calendar cal=parseTimeSpec(timespec);
+		return getNow().after(cal);
+	}
+
+	/**
+	 * Check whether current time is between the specified times.
+	 *
+	 * @param timespec1 A start time in "hh:mm" or "hh:mm:ss" format
+	 * @param timespec2 A end time in "hh:mm" or "hh:mm:ss" format
+	 * @return whether current time is between the specified times
+	 */
+	public boolean isBetween(String timespec1,String timespec2)
+	{
+		Calendar cal_start=parseTimeSpec(timespec1);
+		Calendar cal_end=parseTimeSpec(timespec2);
+		if(cal_start.after(cal_end))
+			throw new IllegalArgumentException("End time "+timespec2+" before start time "+timespec1);
+		Calendar now=getNow();
+		return cal_start.before(now) && cal_end.after(now);
+	}
+
+	public static Time getInstance()
 	{
 		return instance;
 	}
 
-	private static Logger L=Logger.getLogger(SunriseSunset.class.getName());
+	private static Logger L=Logger.getLogger(Time.class.getName());
 }

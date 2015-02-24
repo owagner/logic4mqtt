@@ -269,4 +269,8 @@ public class MQTTHandler
 		return val.toString();
 	}
 
+	public static String getTopicPrefix()
+	{
+		return instance.topicPrefix;
+	}
 }

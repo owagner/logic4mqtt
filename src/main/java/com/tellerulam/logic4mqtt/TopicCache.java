@@ -29,6 +29,11 @@ public class TopicCache
 
 	private static String convertTopic(String inputTopic,String replacement)
 	{
+		if(inputTopic.startsWith("$"))
+		{
+			return MQTTHandler.getTopicPrefix()+"status/"+inputTopic.substring(1);
+		}
+
 		int slashIx=inputTopic.indexOf('/');
 		if(slashIx<0)
 			return inputTopic;

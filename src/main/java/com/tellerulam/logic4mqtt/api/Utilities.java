@@ -174,5 +174,39 @@ public class Utilities
 		sendNetMessage(host,port,message,false,0);
 	}
 
+	/**
+	 * Execute a command with the system's command interpreter.
+	 *
+	 * Returns the command's output, or null in case execution failed.
+	 * If the output contains multiple lines, they are seperated by newlines.
+	 * The last (or only) line will not have a newline appended.
+	 *
+	 * @param cmd The command to execute @see Process.exec
+	 * @return the output of the command as a string, or null.
+	 */
+	public String executeCommand(String cmd)
+	{
+		L.log(Level.INFO, "Executing external command "+cmd);
+		try
+		{
+			StringBuilder result=new StringBuilder();
+			Process proc=Runtime.getRuntime().exec(cmd);
+			BufferedReader br=new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			String l;
+			while((l=br.readLine())!=null)
+			{
+				if(result.length()!=0)
+					result.append('\n');
+				result.append(l);
+			}
+			return result.toString();
+		}
+		catch(Exception e)
+		{
+			L.log(Level.INFO,"Execution of external command "+cmd+" failed",e);
+			return null;
+		}
+	}
+
 	private static Logger L=Logger.getLogger(Utilities.class.getName());
 }
