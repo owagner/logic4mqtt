@@ -109,6 +109,17 @@ public class Events
 		MQTTHandler.doPublish(topic, value, true);
 	}
 
+	public void internalQueueSet(String timespec,String topic,final Object value,final boolean retain)
+	{
+		final String setTopic=TopicCache.convertSetTopic(topic);
+		LogicTimer.addTimer("_SET_"+setTopic, timespec, new TimerCallbackInterface(){
+			@Override
+			public void run(Object userdata)
+			{
+				MQTTHandler.doPublish(setTopic, value, retain);
+			}
+		},null);
+	}
 	/**
 	 * Queue an update to the specified topic with the given value at timespec.
 	 *
@@ -123,14 +134,7 @@ public class Events
 	 */
 	public void queueValue(String timespec,String topic,final Object value)
 	{
-		final String setTopic=TopicCache.convertSetTopic(topic);
-		LogicTimer.addTimer("_SET_"+setTopic, timespec, new TimerCallbackInterface(){
-			@Override
-			public void run(Object userdata)
-			{
-				MQTTHandler.doPublish(setTopic, value, false);
-			}
-		},null);
+		internalQueueSet(timespec,topic,value,false);
 	}
 
 	/**
@@ -148,14 +152,7 @@ public class Events
 	 */
 	public void queueStore(String timespec,String topic,final Object value)
 	{
-		final String setTopic=TopicCache.convertSetTopic(topic);
-		LogicTimer.addTimer("_SET_"+setTopic, timespec, new TimerCallbackInterface(){
-			@Override
-			public void run(Object userdata)
-			{
-				MQTTHandler.doPublish(setTopic, value, true);
-			}
-		},null);
+		internalQueueSet(timespec,topic,value,true);
 	}
 
 
