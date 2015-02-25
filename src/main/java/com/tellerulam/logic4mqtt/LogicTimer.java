@@ -65,6 +65,14 @@ public abstract class LogicTimer
 
 	static final Map<String,List<LogicTimer>> allTimers=new HashMap<>();
 
+	static public Collection<LogicTimer> getAllTimers()
+	{
+		Collection<LogicTimer> l=new ArrayList<>();
+		for(List<LogicTimer> tl:allTimers.values())
+			l.addAll(tl);
+		return l;
+	}
+
 	protected final String symbolicName;
 	protected final String timespec;
 	protected final TimerCallbackInterface callback;
@@ -74,6 +82,22 @@ public abstract class LogicTimer
 	protected TimerTask currentTimerTask;
 
 	abstract void start();
+
+	private static DateFormat summaryFmt=DateFormat.getDateTimeInstance();
+
+	public synchronized String getCmdlineSummary()
+	{
+		StringBuilder msg=new StringBuilder();
+		msg.append(symbolicName);
+		msg.append('\t');
+		msg.append(summaryFmt.format(new Date(currentTimerTask.scheduledExecutionTime())));
+		msg.append('\t');
+		msg.append(timespec);
+		msg.append('\t');
+		msg.append(callback);
+		return msg.toString();
+	}
+
 
 	void cancel()
 	{

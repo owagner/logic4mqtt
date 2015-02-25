@@ -123,6 +123,10 @@ prior to use.
 
 Changelog
 ---------
+* 0.8 - 2015/02/26 - owagner
+  - added a TCP command line interface, mainly intended for diagnostic purposes.
+  Enable by specifying logic4mqtt.cmdline.port=<TCP port number to listen on>
+  
 * 0.7 - 2015/02/23 - owagner
   - API: renamed the SunriseSunset object to "Time"
   - API: added Time.isBefore(), Time.isAfter() and Time.isBetween()

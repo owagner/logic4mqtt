@@ -9,11 +9,13 @@ import java.util.regex.*;
 
 import org.eclipse.paho.client.mqttv3.*;
 
+import com.tellerulam.logic4mqtt.cmdline.*;
+
 public class Main
 {
 	static final Timer t=new Timer(true);
 
-	private static String getVersion()
+	public static String getVersion()
 	{
 		// First, try the manifest tag
 		String version=Main.class.getPackage().getImplementationVersion();
@@ -56,6 +58,7 @@ public class Main
 		}
 		SyslogHandler.readConfig();
 		Logger.getLogger(Main.class.getName()).info("logic4mqtt V"+getVersion()+" (C) 2015 Oliver Wagner <owagner@tellerulam.com>");
+		CmdlineHandler.init();
 		MQTTHandler.init();
 		String scriptDirs=System.getProperty("logic4mqtt.scripts.dir","scripts");
 		for(String scriptDir:scriptDirs.split(":"))
