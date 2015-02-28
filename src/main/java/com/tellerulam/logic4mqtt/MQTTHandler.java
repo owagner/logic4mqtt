@@ -22,13 +22,16 @@ public class MQTTHandler
 
 	private static MQTTHandler instance;
 
-	private final String topicPrefix;
+	private static String topicPrefix="logic/";
 	private MQTTHandler()
 	{
-		String tp=System.getProperty("logic4mqtt.mqtt.topic","logic");
-		if(!tp.endsWith("/"))
-			tp+="/";
-		topicPrefix=tp;
+		String tp=System.getProperty("logic4mqtt.mqtt.topic");
+		if(tp!=null)
+		{
+			if(!tp.endsWith("/"))
+				tp+="/";
+			topicPrefix=tp;
+		}
 	}
 
 	private MqttClient mqttc;
@@ -271,6 +274,6 @@ public class MQTTHandler
 
 	public static String getTopicPrefix()
 	{
-		return instance.topicPrefix;
+		return topicPrefix;
 	}
 }

@@ -17,6 +17,8 @@ public class TopicCacheTest
 		assertEquals("test",TopicCache.convertSetTopic("test"));
 		assertEquals("test/",TopicCache.convertSetTopic("test/"));
 		assertEquals("test/set/",TopicCache.convertSetTopic("test//"));
+
+		assertEquals("logic/status/test",TopicCache.convertSetTopic("$test"));
 	}
 
 }

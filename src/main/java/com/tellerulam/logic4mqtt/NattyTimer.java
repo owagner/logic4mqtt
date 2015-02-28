@@ -1,6 +1,5 @@
 package com.tellerulam.logic4mqtt;
 
-import java.text.*;
 import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
