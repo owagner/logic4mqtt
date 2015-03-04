@@ -1,6 +1,7 @@
 package com.tellerulam.logic4mqtt;
 
-import java.text.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
@@ -30,8 +31,14 @@ public class NattyTimer extends LogicTimer
 	{
 		schedule();
 	}
+	private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |civil )?(sunset|sunrise)(\\s?(\\+|\\-)\\s?([0-9]+)\\s?(s|m|h)\\w*)?");
+	private static final DateFormat hhmmss=new SimpleDateFormat("HH:mm:ss");
 
-	private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |civil )?(sunset|sunrise)");
+	/* Overridable for unit testing only */
+	protected Time getTimeInstance()
+	{
+		return Time.getInstance();
+	}
 
 	private void parseTime()
 	{
@@ -54,7 +61,7 @@ public class NattyTimer extends LogicTimer
 				char type='o';
 				if(m.group(1)!=null)
 					type=m.group(1).charAt(0);
-				Time ss=Time.getInstance();
+				Time ss=getTimeInstance();
 				switch(type)
 				{
 					case 'c':
@@ -69,6 +76,39 @@ public class NattyTimer extends LogicTimer
 					case 'n':
 						replacement=(rise)?ss.getNauticalSunrise():ss.getNauticalSunset();
 						break;
+				}
+				// Further adjustmnet?
+				if(m.group(3)!=null)
+				{
+					int amount=Integer.parseInt(m.group(5));
+					int what;
+					switch(m.group(6))
+					{
+						case "h":
+							what=Calendar.HOUR_OF_DAY;
+							break;
+						case "m":
+							what=Calendar.MINUTE;
+							break;
+						case "s":
+							what=Calendar.SECOND;
+							break;
+						default:
+							// This can't happen due to the pattern
+							throw new IllegalArgumentException("Internal error");
+					}
+					Calendar cal=Calendar.getInstance();
+					String spec[]=replacement.split(":");
+					cal.set(Calendar.HOUR_OF_DAY,Integer.parseInt(spec[0]));
+					cal.set(Calendar.MINUTE,Integer.parseInt(spec[1]));
+					cal.set(Calendar.SECOND,0);
+					if("-".equals(m.group(4)))
+						amount=-amount;
+					cal.add(what, amount);
+					synchronized(hhmmss)
+					{
+						replacement=hhmmss.format(cal.getTime());
+					}
 				}
 				m.appendReplacement(newtimespec,replacement);
 				needToCheckSunpatterns=true;
@@ -155,6 +195,11 @@ public class NattyTimer extends LogicTimer
 		}
 		msg.append("]");
 		return msg.toString();
+	}
+
+	protected Date getFirstDateForTest()
+	{
+		return dates.get(0);
 	}
 
 	private static final Logger L=Logger.getLogger(NattyTimer.class.getName());
