@@ -1,7 +1,5 @@
 package com.tellerulam.logic4mqtt;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
@@ -31,8 +29,9 @@ public class NattyTimer extends LogicTimer
 	{
 		schedule();
 	}
-	private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |civil )?(sunset|sunrise)(\\s?(\\+|\\-)\\s?([0-9]+)\\s?(s|m|h)\\w*)?");
-	private static final DateFormat hhmmss=new SimpleDateFormat("HH:mm:ss");
+	//private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |civil )?(sunset|sunrise)(\\s?(\\+|\\-)\\s?([0-9]+)\\s?(s|m|h)\\w*)?");
+	private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |civil )?(sunset|sunrise)");
+	//private static final DateFormat hhmmss=new SimpleDateFormat("HH:mm:ss");
 
 	/* Overridable for unit testing only */
 	protected Time getTimeInstance()
@@ -77,6 +76,7 @@ public class NattyTimer extends LogicTimer
 						replacement=(rise)?ss.getNauticalSunrise():ss.getNauticalSunset();
 						break;
 				}
+				/*
 				// Further adjustmnet?
 				if(m.group(3)!=null)
 				{
@@ -109,7 +109,7 @@ public class NattyTimer extends LogicTimer
 					{
 						replacement=hhmmss.format(cal.getTime());
 					}
-				}
+				}*/
 				m.appendReplacement(newtimespec,replacement);
 				needToCheckSunpatterns=true;
 			}

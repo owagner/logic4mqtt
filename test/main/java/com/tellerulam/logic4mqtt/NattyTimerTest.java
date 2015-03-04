@@ -18,15 +18,15 @@ public class NattyTimerTest
 			"civil sunset", "18:17:00",
 			"civil sunrise", "07:29:00",
 
-			"civil sunset+1m", "18:18:00",
-			"civil sunrise-1hour", "06:29:00",
+			"1 minute after civil sunset", "18:18:00",
+			"1 hour before civil sunrise", "06:29:00",
 
-			"civil sunset +1 m", "18:18:00",
-			"civil sunrise -1 hour", "06:29:00",
+			"1 min after civil sunset", "18:18:00",
+			"1 hour before civil sunrise", "06:29:00",
 
-			"civil sunset +61 m", "19:18:00",
-			"civil sunrise -1 seconds", "07:28:59",
-			"every civil sunrise -1 s", "07:28:59",
+			"61 minutes after civil sunset", "19:18:00",
+			"1 seconds before civil sunrise", "07:28:59",
+			"every one second before civil sunrise", "07:28:59",
 		};
 		DateFormat df=new SimpleDateFormat("HH:mm:ss");
 		for(int ix=0;ix<cases.length;ix+=2)

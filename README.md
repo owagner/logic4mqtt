@@ -124,9 +124,7 @@ prior to use.
 Changelog
 ---------
 * 0.9 - 2015/03/04 - owagner
-  - API: sunset/sunrise specifications in natural language timer specifications can now have
-   an optional suffix of the form "+/- amount h|m|s", which adjusts the time by the given amount
-   of hours, minutes or seconds 
+  - added some Natty test cases 
 
 * 0.8 - 2015/02/26 - owagner
   - added a TCP command line interface, mainly intended for diagnostic purposes.
