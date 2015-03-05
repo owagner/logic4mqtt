@@ -124,8 +124,12 @@ prior to use.
 Changelog
 ---------
 * 0.9 - 2015/03/04 - owagner
-  - added some Natty test cases 
-
+  - added a Event.add() call which adds a event handler callback with extended parameters
+  - added support for one-shot event handlers. Only available via Event.add()
+  - added support for event handlers with expiration. Only available via Event.add(). Expiration
+    is specified in standard timer notation.
+  - added some Natty test cases
+   
 * 0.8 - 2015/02/26 - owagner
   - added a TCP command line interface, mainly intended for diagnostic purposes.
   Enable by specifying logic4mqtt.cmdline.port=<TCP port number to listen on>

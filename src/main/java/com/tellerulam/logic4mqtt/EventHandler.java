@@ -17,36 +17,21 @@ public class EventHandler
 		}
 	}
 
-	static private Number convertToNumberIfPossible(Object possibleNumber)
-	{
-		if(possibleNumber instanceof Number)
-			return (Number)possibleNumber;
-		try
-		{
-			return new Double(possibleNumber.toString());
-		}
-		catch(NumberFormatException e)
-		{
-			/* Not convertable */
-			return null;
-		}
-	}
-
-	static public int createNewHandler(String topicPattern, Object[] destvalues, boolean changeOnly, EventCallbackInterface callback)
+	static public int createNewHandler(String topicPattern, Object[] destvalues, boolean changeOnly, EventCallbackInterface callback, boolean oneShot)
 	{
 		// Replace any possible destvalue with a Number instance, if possible
 		if(destvalues!=null)
 		{
 			for(int i=0;i<destvalues.length;i++)
 			{
-				Number n=convertToNumberIfPossible(destvalues[i]);
+				Number n=ScriptEngineTools.convertToNumberIfPossible(destvalues[i]);
 				if(n!=null)
 					destvalues[i]=n;
 			}
 		}
 		synchronized(handlers)
 		{
-			EventHandler handler=new EventHandler(++idCounter,topicPattern,destvalues,changeOnly,callback);
+			EventHandler handler=new EventHandler(++idCounter,topicPattern,destvalues,changeOnly,callback,oneShot);
 			handlers.put(Integer.valueOf(handler.id),handler);
 			if(L.isLoggable(Level.INFO))
 				L.info("Created new Event handler "+handler);
@@ -74,7 +59,7 @@ public class EventHandler
 	{
 		if(destvalues==null)
 			return true;
-		Number valueAsNumber=convertToNumberIfPossible(value);
+		Number valueAsNumber=ScriptEngineTools.convertToNumberIfPossible(value);
 		String valueAsString=null;
 		L.info("value is "+value+" "+value.getClass());
 		for(Object dv:destvalues)
@@ -132,6 +117,8 @@ public class EventHandler
 			{
 				L.log(Level.WARNING, "Error when executing event callback for "+topic+"="+value,e);
 			}
+			if(EventHandler.this.oneShot)
+				EventHandler.removeByID(EventHandler.this.id);
 		}
 	}
 
@@ -139,24 +126,25 @@ public class EventHandler
 
 	static final Logger L=Logger.getLogger(EventHandler.class.getName());
 
-	private EventHandler(int id, String topicPattern, Object[] destvalues, boolean changeOnly, EventCallbackInterface callback)
+	private EventHandler(int id, String topicPattern, Object[] destvalues, boolean changeOnly, EventCallbackInterface callback,boolean oneShot)
 	{
 		this.id=id;
 		this.topicPattern=topicPattern;
 		this.destvalues=destvalues;
 		this.changeOnly=changeOnly;
 		this.callback=callback;
+		this.oneShot=true;
 	}
 
 	@Override
 	public String toString()
 	{
-		return "["+id+":"+topicPattern+"="+(destvalues==null?"*":Arrays.asList(destvalues))+"/"+(changeOnly?"CH":"UP")+"]";
+		return "["+id+":"+topicPattern+"="+(destvalues==null?"*":Arrays.asList(destvalues))+"/"+(changeOnly?"CH":"UP")+(oneShot?"/OS":"")+"]";
 	}
 
 	private final int id;
 	private final String topicPattern;
 	private final Object destvalues[];
-	private final boolean changeOnly;
+	private final boolean changeOnly, oneShot;
 	private final EventCallbackInterface callback;
 }

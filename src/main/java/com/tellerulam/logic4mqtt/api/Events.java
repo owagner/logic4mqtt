@@ -31,7 +31,7 @@ public class Events
 	public int onChangeTo(String topicPattern,Object value,EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, new Object[]{value}, true, callback);
+		return EventHandler.createNewHandler(topicPattern, new Object[]{value}, true, callback, false);
 	}
 	/**
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
@@ -45,7 +45,7 @@ public class Events
 	public int onChangeTo(String topicPattern,Object values[],EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, values, true, callback);
+		return EventHandler.createNewHandler(topicPattern, values, true, callback, false);
 	}
 	/**
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
@@ -58,7 +58,7 @@ public class Events
 	public int onChange(String topicPattern,EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, null, true, callback);
+		return EventHandler.createNewHandler(topicPattern, null, true, callback, false);
 	}
 	/**
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
@@ -71,8 +71,61 @@ public class Events
 	public int onUpdate(String topicPattern,EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, null, false, callback);
+		return EventHandler.createNewHandler(topicPattern, null, false, callback, false);
 	}
+
+	/**
+	 * Add an Event Handler using a description object (e.g. JSON object from Javascript)
+	 *
+	 * @param topicPattern
+	 * @param callback
+	 * @param params Map with parameters:
+	 *   values - value or array of values which trigger the event
+	 *   change - bool: whether to run only on changes of the value
+	 *   oneshot - bool: whether to remove the event handler after it run once
+	 *
+	 * @return id of the new handler (to be used with e.g. remove)
+	 */
+	@SuppressWarnings("unchecked")
+	public int add(String topicPattern,EventCallbackInterface callback,Map<String,Object> params)
+	{
+		Object values=params.get("values");
+		Object vals[];
+		if(values!=null)
+		{
+			if(values instanceof Map)
+			{
+				vals=((Map<String,Object>)values).values().toArray();
+			}
+			else
+				vals=new Object[]{values};
+		}
+		else
+			vals=null;
+
+		boolean oneShot=ScriptEngineTools.interpretAsBoolean(params.get("oneshot"));
+		boolean change=ScriptEngineTools.interpretAsBoolean(params.get("change"));
+
+		String expires=(String)params.get("expires");
+
+		topicPattern=TopicCache.convertStatusTopic(topicPattern);
+		int eid=EventHandler.createNewHandler(topicPattern, vals, change, callback, oneShot);
+
+		/* Queue an timer to expire the event handler, if "expires" was set */
+		if(expires!=null)
+		{
+			LogicTimer.addTimer("_EVENT_EXPIRER"+topicPattern,expires,new TimerCallbackInterface(){
+				@Override
+				public void run(Object userdata)
+				{
+					remove(((Integer)userdata).intValue());
+				}
+			},Integer.valueOf(eid));
+		}
+
+		return eid;
+	}
+
 	/**
 	 * Removes an event handler which was added with one of the on...() methods.
 	 *
