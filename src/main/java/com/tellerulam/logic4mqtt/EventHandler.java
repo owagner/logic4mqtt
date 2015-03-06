@@ -133,7 +133,7 @@ public class EventHandler
 		this.destvalues=destvalues;
 		this.changeOnly=changeOnly;
 		this.callback=callback;
-		this.oneShot=true;
+		this.oneShot=oneShot;
 	}
 
 	@Override
