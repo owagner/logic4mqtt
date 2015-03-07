@@ -123,6 +123,11 @@ prior to use.
 
 Changelog
 ---------
+* 0.10 - 2015/03/07 - owagner
+  - API: topic patterns are now actually RegExes
+  - API: topics passed into callbacks now have a "/status/" function prefix replaced by "//",
+    so the topics can immediately be used for setValue() calls
+
 * 0.9 - 2015/03/04 - owagner
   - added a Event.add() call which adds a event handler callback with extended parameters
   - added support for one-shot event handlers. Only available via Event.add()

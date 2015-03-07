@@ -6,6 +6,7 @@ package com.tellerulam.logic4mqtt;
 
 import java.util.*;
 import java.util.logging.*;
+import java.util.regex.*;
 
 public class TopicCache
 {
@@ -45,6 +46,23 @@ public class TopicCache
 			return inputTopic.substring(0,slashIx+1)+replacement+inputTopic.substring(slashIx+1);
 		}
 		return inputTopic;
+	}
+
+	private static final Pattern replaceStatusPattern=Pattern.compile("[^/]*/status/.*");
+
+	/**
+	 * Replaces a "/status/" in a topic with "//"
+	 *
+	 * @param topic
+	 * @return
+	 */
+	public static String removeStatusFunction(String topic)
+	{
+		// Replace /status/ in topic with //
+		Matcher m=replaceStatusPattern.matcher(topic);
+		if(m.matches())
+			return topic.replaceFirst("/status/","//");
+		return topic;
 	}
 
 	static TopicCache storeTopic(String topic,Object newValue)

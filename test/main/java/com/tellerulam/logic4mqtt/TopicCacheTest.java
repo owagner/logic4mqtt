@@ -21,4 +21,12 @@ public class TopicCacheTest
 		assertEquals("logic/status/test",TopicCache.convertSetTopic("$test"));
 	}
 
+	@Test
+	public void testStatus()
+	{
+		assertEquals("test//blah",TopicCache.removeStatusFunction("test/status/blah"));
+		assertEquals("test/set/blah",TopicCache.removeStatusFunction("test/set/blah"));
+		assertEquals("test/gurgh/status/blah",TopicCache.removeStatusFunction("test/gurgh/status/blah"));
+	}
+
 }

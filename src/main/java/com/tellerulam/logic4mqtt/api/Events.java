@@ -23,7 +23,7 @@ public class Events
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
 	 * topic changes to the specified value.
 	 *
-	 * @param topicPattern
+	 * @param topicPattern a RegEx matching topics
 	 * @param value
 	 * @param callback
 	 * @return id of the new handler (to be used with e.g. remove)
@@ -37,7 +37,7 @@ public class Events
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
 	 * topic changes to any of the the specified values.
 	 *
-	 * @param topicPattern
+	 * @param topicPattern a RegEx matching topics
 	 * @param values
 	 * @param callback
 	 * @return id of the new handler (to be used with e.g. remove)
@@ -51,7 +51,7 @@ public class Events
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
 	 * topic changes from the previous value.
 	 *
-	 * @param topicPattern
+	 * @param topicPattern a RegEx matching topics
 	 * @param callback
 	 * @return id of the new handler (to be used with e.g. remove)
 	 */
@@ -62,9 +62,9 @@ public class Events
 	}
 	/**
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
-	 * topic is being published, regardless of the value.
+	 * topic is being published to, regardless of the value.
 	 *
-	 * @param topicPattern
+	 * @param topicPattern a RegEx matching topics
 	 * @param callback
 	 * @return id of the new handler (to be used with e.g. remove)
 	 */
@@ -114,7 +114,7 @@ public class Events
 		/* Queue an timer to expire the event handler, if "expires" was set */
 		if(expires!=null)
 		{
-			LogicTimer.addTimer("_EVENT_EXPIRER"+topicPattern,expires,new TimerCallbackInterface(){
+			LogicTimer.addTimer("_EVENT_EXPIRER_"+topicPattern,expires,new TimerCallbackInterface(){
 				@Override
 				public void run(Object userdata)
 				{

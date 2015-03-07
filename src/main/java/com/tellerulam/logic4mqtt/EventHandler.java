@@ -3,6 +3,7 @@ package com.tellerulam.logic4mqtt;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.*;
+import java.util.regex.*;
 
 public class EventHandler
 {
@@ -85,11 +86,13 @@ public class EventHandler
 
 	private boolean handles(String topic)
 	{
-		return topicPattern.equals(topic);
+		Matcher m=topicPattern.matcher(topic);
+		return m.matches();
 	}
 
 	private void queueExecution(String topic,Object value,Object previousValue,Date previousTimestamp)
 	{
+		topic=TopicCache.removeStatusFunction(topic);
 		eventExecutor.execute(new EventRunner(topic,value,previousValue,previousTimestamp));
 	}
 
@@ -122,14 +125,14 @@ public class EventHandler
 		}
 	}
 
-	static final Executor eventExecutor=Executors.newCachedThreadPool();
+	static final Executor eventExecutor=Executors.newFixedThreadPool(1);
 
 	static final Logger L=Logger.getLogger(EventHandler.class.getName());
 
 	private EventHandler(int id, String topicPattern, Object[] destvalues, boolean changeOnly, EventCallbackInterface callback,boolean oneShot)
 	{
 		this.id=id;
-		this.topicPattern=topicPattern;
+		this.topicPattern=Pattern.compile(topicPattern);
 		this.destvalues=destvalues;
 		this.changeOnly=changeOnly;
 		this.callback=callback;
@@ -143,7 +146,7 @@ public class EventHandler
 	}
 
 	private final int id;
-	private final String topicPattern;
+	private final Pattern topicPattern;
 	private final Object destvalues[];
 	private final boolean changeOnly, oneShot;
 	private final EventCallbackInterface callback;
