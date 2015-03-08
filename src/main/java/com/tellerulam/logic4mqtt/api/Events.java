@@ -176,7 +176,7 @@ public class Events
 	public void internalQueueSet(String timespec,String topic,final Object value,final boolean retain)
 	{
 		final String setTopic=TopicCache.convertSetTopic(topic);
-		LogicTimer.addTimer("_SET_"+setTopic, timespec, new QueuedSet(topic,value,retain),null);
+		LogicTimer.addTimer("_SET_"+setTopic, timespec, new QueuedSet(setTopic,value,retain),null);
 	}
 	/**
 	 * Queue an update to the specified topic with the given value at timespec.
