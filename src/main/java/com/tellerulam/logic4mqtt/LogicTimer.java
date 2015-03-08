@@ -68,8 +68,11 @@ public abstract class LogicTimer
 	static public Collection<LogicTimer> getAllTimers()
 	{
 		Collection<LogicTimer> l=new ArrayList<>();
-		for(List<LogicTimer> tl:allTimers.values())
-			l.addAll(tl);
+		synchronized(allTimers)
+		{
+			for(List<LogicTimer> tl:allTimers.values())
+				l.addAll(tl);
+		}
 		return l;
 	}
 

@@ -9,7 +9,9 @@ public abstract class Cmd
 
 	static void initCommands()
 	{
+		add(new CmdEvents());
 		add(new CmdHelp());
+		add(new CmdParseTime());
 		add(new CmdQuit());
 		add(new CmdTimers());
 		add(new CmdTimes());

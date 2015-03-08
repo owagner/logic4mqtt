@@ -39,6 +39,25 @@ public class NattyTimer extends LogicTimer
 		return Time.getInstance();
 	}
 
+	public static class ParsedSpec
+	{
+		public final List<Date> dates;
+		public final boolean recurrence;
+		public final Date recursUntil;
+		public ParsedSpec(List<Date> dates,boolean recurrence,Date recursUntil)
+		{
+			this.dates=dates;
+			this.recurrence=recurrence;
+			this.recursUntil=recursUntil;
+		}
+	}
+
+	public static ParsedSpec parseTimeSpec(String timespec)
+	{
+		NattyTimer t=new NattyTimer("",timespec,null,null);
+		return new ParsedSpec(t.dates,t.recurrence,t.recursUntil);
+	}
+
 	private void parseTime()
 	{
 		/*
@@ -76,40 +95,6 @@ public class NattyTimer extends LogicTimer
 						replacement=(rise)?ss.getNauticalSunrise():ss.getNauticalSunset();
 						break;
 				}
-				/*
-				// Further adjustmnet?
-				if(m.group(3)!=null)
-				{
-					int amount=Integer.parseInt(m.group(5));
-					int what;
-					switch(m.group(6))
-					{
-						case "h":
-							what=Calendar.HOUR_OF_DAY;
-							break;
-						case "m":
-							what=Calendar.MINUTE;
-							break;
-						case "s":
-							what=Calendar.SECOND;
-							break;
-						default:
-							// This can't happen due to the pattern
-							throw new IllegalArgumentException("Internal error");
-					}
-					Calendar cal=Calendar.getInstance();
-					String spec[]=replacement.split(":");
-					cal.set(Calendar.HOUR_OF_DAY,Integer.parseInt(spec[0]));
-					cal.set(Calendar.MINUTE,Integer.parseInt(spec[1]));
-					cal.set(Calendar.SECOND,0);
-					if("-".equals(m.group(4)))
-						amount=-amount;
-					cal.add(what, amount);
-					synchronized(hhmmss)
-					{
-						replacement=hhmmss.format(cal.getTime());
-					}
-				}*/
 				m.appendReplacement(newtimespec,replacement);
 				needToCheckSunpatterns=true;
 			}

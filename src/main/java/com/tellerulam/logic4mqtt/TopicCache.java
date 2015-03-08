@@ -28,6 +28,11 @@ public class TopicCache
 		return convertTopic(inputTopic,"status");
 	}
 
+	public static String convertGetTopic(String inputTopic)
+	{
+		return convertTopic(inputTopic,"get");
+	}
+
 	private static String convertTopic(String inputTopic,String replacement)
 	{
 		if(inputTopic.startsWith("$"))

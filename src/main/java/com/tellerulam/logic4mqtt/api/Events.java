@@ -31,7 +31,7 @@ public class Events
 	public int onChangeTo(String topicPattern,Object value,EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, new Object[]{value}, true, callback, false);
+		return EventHandler.createNewHandler(topicPattern, new Object[]{value}, true, callback, false, null);
 	}
 	/**
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
@@ -45,7 +45,7 @@ public class Events
 	public int onChangeTo(String topicPattern,Object values[],EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, values, true, callback, false);
+		return EventHandler.createNewHandler(topicPattern, values, true, callback, false, null);
 	}
 	/**
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
@@ -58,7 +58,7 @@ public class Events
 	public int onChange(String topicPattern,EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, null, true, callback, false);
+		return EventHandler.createNewHandler(topicPattern, null, true, callback, false, null);
 	}
 	/**
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
@@ -71,7 +71,7 @@ public class Events
 	public int onUpdate(String topicPattern,EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, null, false, callback, false);
+		return EventHandler.createNewHandler(topicPattern, null, false, callback, false, null);
 	}
 
 	/**
@@ -109,19 +109,7 @@ public class Events
 		String expires=(String)params.get("expires");
 
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		int eid=EventHandler.createNewHandler(topicPattern, vals, change, callback, oneShot);
-
-		/* Queue an timer to expire the event handler, if "expires" was set */
-		if(expires!=null)
-		{
-			LogicTimer.addTimer("_EVENT_EXPIRER_"+topicPattern,expires,new TimerCallbackInterface(){
-				@Override
-				public void run(Object userdata)
-				{
-					remove(((Integer)userdata).intValue());
-				}
-			},Integer.valueOf(eid));
-		}
+		int eid=EventHandler.createNewHandler(topicPattern, vals, change, callback, oneShot, expires);
 
 		return eid;
 	}
@@ -162,16 +150,33 @@ public class Events
 		MQTTHandler.doPublish(topic, value, true);
 	}
 
+	private static class QueuedSet implements TimerCallbackInterface
+	{
+		final String setTopic;
+		final Object value;
+		final boolean retain;
+		@Override
+		public void run(Object userdata)
+		{
+			MQTTHandler.doPublish(setTopic, value, retain);
+		}
+		@Override
+		public String toString()
+		{
+			return "{QuSet:="+value+(retain?"/R":""+"}");
+		}
+		protected QueuedSet(String setTopic, Object value, boolean retain)
+		{
+			this.setTopic = setTopic;
+			this.value = value;
+			this.retain = retain;
+		}
+	}
+
 	public void internalQueueSet(String timespec,String topic,final Object value,final boolean retain)
 	{
 		final String setTopic=TopicCache.convertSetTopic(topic);
-		LogicTimer.addTimer("_SET_"+setTopic, timespec, new TimerCallbackInterface(){
-			@Override
-			public void run(Object userdata)
-			{
-				MQTTHandler.doPublish(setTopic, value, retain);
-			}
-		},null);
+		LogicTimer.addTimer("_SET_"+setTopic, timespec, new QueuedSet(topic,value,retain),null);
 	}
 	/**
 	 * Queue an update to the specified topic with the given value at timespec.
@@ -274,5 +279,15 @@ public class Events
 	public Date getTimestamp(String topic)
 	{
 		return getTimestamp(topic,0);
+	}
+
+	/**
+	 * Request a value via a MQTT /get/ publish
+	 * @param topic
+	 */
+	public void requestValue(String topic)
+	{
+		topic=TopicCache.convertGetTopic(topic);
+		MQTTHandler.doPublish(topic, "?", false);
 	}
 }
