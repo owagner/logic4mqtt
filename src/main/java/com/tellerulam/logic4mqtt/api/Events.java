@@ -6,6 +6,9 @@ package com.tellerulam.logic4mqtt.api;
 
 import java.util.*;
 
+import javax.script.*;
+
+import com.eclipsesource.json.*;
 import com.tellerulam.logic4mqtt.*;
 import com.tellerulam.logic4mqtt.TopicCache.TopicValue;
 
@@ -138,6 +141,12 @@ public class Events
 		MQTTHandler.doPublish(topic, value, false);
 	}
 
+	public void setValue(String topic,Map<String,Object> value)
+	{
+		topic=TopicCache.convertSetTopic(topic);
+		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(value), false);
+	}
+
 	/**
 	 * Publish an update to the specified topic with the given value. It will be retained.
 	 *
@@ -148,6 +157,12 @@ public class Events
 	{
 		topic=TopicCache.convertSetTopic(topic);
 		MQTTHandler.doPublish(topic, value, true);
+	}
+
+	public void storeValue(String topic,Map<String,Object> value)
+	{
+		topic=TopicCache.convertSetTopic(topic);
+		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(value), true);
 	}
 
 	private static class QueuedSet implements TimerCallbackInterface
@@ -190,10 +205,16 @@ public class Events
 	 *
 	 * @see Timers
 	 */
-	public void queueValue(String timespec,String topic,final Object value)
+	public void queueValue(String timespec,String topic,Object value)
 	{
 		internalQueueSet(timespec,topic,value,false);
 	}
+
+	public void queueValue(String timespec,String topic,Map<String,Object> value)
+	{
+		internalQueueSet(timespec,topic,ScriptEngineTools.encodeAsJSON(value),false);
+	}
+
 
 	/**
 	 * Queue an update to the specified topic with the given value at timespec,
@@ -208,11 +229,15 @@ public class Events
 	 *
 	 * @see Timers
 	 */
-	public void queueStore(String timespec,String topic,final Object value)
+	public void queueStore(String timespec,String topic,Object value)
 	{
 		internalQueueSet(timespec,topic,value,true);
 	}
 
+	public void queueStore(String timespec,String topic,Map<String,Object> value)
+	{
+		internalQueueSet(timespec,topic,ScriptEngineTools.encodeAsJSON(value),true);
+	}
 
 	/**
 	 * Clears possibly queued value sets for the given topic

@@ -115,6 +115,8 @@ public class MQTTHandler
 		{
 			JsonObject data=JsonObject.readFrom(payload);
 			JsonValue val=data.get("val");
+			if(val==null)
+				return;
 			if(val.isNumber())
 				transformedVal=Double.valueOf(val.asDouble());
 			else if(val.isString())

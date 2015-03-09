@@ -123,6 +123,10 @@ prior to use.
 
 Changelog
 ---------
+* 0.11 - 2015/03/09 - owagner
+  - API: it's now possible to pass Javascript objects to setValue() et.al., which will then be converted
+    to JSON before publishing
+
 * 0.10 - 2015/03/07 - owagner
   - API: added Events.requestValue() for MQTT /get/ requests
   - API: topic patterns are now actually RegExes
