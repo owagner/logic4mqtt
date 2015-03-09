@@ -4,7 +4,6 @@ import java.lang.reflect.*;
 import java.util.*;
 
 import javax.script.*;
-import javax.xml.bind.*;
 
 import com.eclipsesource.json.*;
 
@@ -40,10 +39,14 @@ public class ScriptEngineTools
 
 	private static JsonValue objectToJsonValue(Object v)
 	{
+		if(v==null)
+			return JsonValue.NULL;
 		if(v instanceof Integer)
 			return JsonValue.valueOf(((Integer)v).intValue());
 		else if(v instanceof Number)
 			return JsonValue.valueOf(((Number)v).doubleValue());
+		else if(v instanceof Boolean)
+			return ((Boolean)v).booleanValue()?JsonValue.TRUE:JsonValue.FALSE;
 		else
 			return JsonValue.valueOf(v.toString());
 	}

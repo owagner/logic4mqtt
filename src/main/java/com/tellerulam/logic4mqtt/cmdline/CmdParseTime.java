@@ -3,7 +3,6 @@ package com.tellerulam.logic4mqtt.cmdline;
 import java.io.*;
 
 import com.tellerulam.logic4mqtt.*;
-import com.tellerulam.logic4mqtt.api.*;
 
 public class CmdParseTime extends Cmd
 {
