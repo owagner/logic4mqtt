@@ -12,24 +12,20 @@ import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
 
-import com.luckycatlabs.sunrisesunset.*;
-import com.luckycatlabs.sunrisesunset.calculator.*;
-import com.luckycatlabs.sunrisesunset.dto.*;
+import net.sourceforge.novaforjava.JulianDay;
+import net.sourceforge.novaforjava.api.LnDate;
+import net.sourceforge.novaforjava.api.LnLnlatPosn;
+import net.sourceforge.novaforjava.api.LnRstTime;
+import net.sourceforge.novaforjava.solarsystem.Solar;
 
 public class Time
 {
 	private static final Time instance=new Time();
 
-	private Location location;
-	private SolarEventCalculator sscalc;
-
-	private synchronized SolarEventCalculator getCalculator()
+	private LnLnlatPosn location=new LnLnlatPosn();
 	{
-		if(location==null)
-			location=new Location("51.358813","7.241483");
-		if(sscalc==null)
-			sscalc=new SolarEventCalculator(location,TimeZone.getDefault());
-		return sscalc;
+		location.lat=51.358813;
+		location.lng=7.241483;
 	}
 
 	/**
@@ -40,22 +36,39 @@ public class Time
 	 */
 	public synchronized void setLocation(String latitude,String longitude)
 	{
-		location=new Location(latitude,longitude);
-		sscalc=null;
+		LnLnlatPosn newLocation=new LnLnlatPosn();
+		newLocation.lat=Double.parseDouble(latitude);
+		newLocation.lng=Double.parseDouble(longitude);
+		location=newLocation;
 		L.config("Set location for sunset calculations to "+location);
 	}
 
-	private Zenith getZenith(String name)
+	private double getZenith(String name)
 	{
 		if(name==null || "OFFICIAL".equalsIgnoreCase(name))
-			return Zenith.OFFICIAL;
+			return Solar.LN_SOLAR_STANDART_HORIZON;
 		else if("ASTRONOMICAL".equalsIgnoreCase(name))
-			return Zenith.ASTRONOMICAL;
+			return 18;
 		else if("NAUTICAL".equalsIgnoreCase(name))
-			return Zenith.NAUTICAL;
+			return 12;
 		else if("CIVIL".equalsIgnoreCase(name))
-			return Zenith.CIVIL;
+			return 6;
 		throw new IllegalArgumentException("Unknown zenith "+name);
+	}
+
+	private LnRstTime calcSSTimes(String zenith)
+	{
+		double jd=JulianDay.ln_get_julian_from_sys();
+		LnRstTime result=new LnRstTime();
+		Solar.ln_get_solar_rst_horizon(jd, location, getZenith(zenith), result);
+		return result;
+	}
+
+	private String jdToTimeString(double jd)
+	{
+		 LnDate date=new LnDate();
+		 JulianDay.ln_get_date(jd, date);
+		 return String.format("%02d:%02d",date.hours,date.minutes);
 	}
 
 	/**
@@ -66,7 +79,8 @@ public class Time
 	 */
 	public String getSunrise(String zenith)
 	{
-		return getCalculator().computeSunriseTime(getZenith(zenith), Calendar.getInstance());
+		LnRstTime res=calcSSTimes(zenith);
+		return jdToTimeString(res.rise);
 	}
 	/**
 	 * Get the Sunset time (format hh:mm) for the given Zentih
@@ -76,7 +90,8 @@ public class Time
 	 */
 	public String getSunset(String zenith)
 	{
-		return getCalculator().computeSunsetTime(getZenith(zenith), Calendar.getInstance());
+		LnRstTime res=calcSSTimes(zenith);
+		return jdToTimeString(res.set);
 	}
 
 	/**
@@ -172,11 +187,9 @@ public class Time
 
 	public boolean isDaylight(String zenith)
 	{
-		Calendar now=Calendar.getInstance();
-		Zenith z=getZenith(zenith);
-		Calendar sunrise=getCalculator().computeSunriseCalendar(z, now);
-		Calendar sunset=getCalculator().computeSunsetCalendar(z, now);
-		return(now.compareTo(sunrise)>0 && now.compareTo(sunset)<0);
+		LnRstTime res=calcSSTimes(zenith);
+		double jd=JulianDay.ln_get_julian_from_sys();
+		return jd>=res.rise && jd<=res.set;
 	}
 
 	/**
@@ -210,7 +223,7 @@ public class Time
 	 * Shortcut to isDaylight() with the given zenith
 	 * @return whether it is currently daylight
 	 */
-	public boolean isOfficial()
+	public boolean isOfficialDaylight()
 	{
 		return isDaylight(null);
 	}

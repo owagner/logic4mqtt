@@ -5,6 +5,7 @@ logic4mqtt
   
   Provided under the terms of the MIT license.
 
+
 Overview
 --------
 logic4mqtt is a logic and scripting engine for SmartHome automation, based around MQTT as a central
@@ -22,7 +23,7 @@ Dependencies
 * Eclipse Paho: https://www.eclipse.org/paho/clients/java/ (used for MQTT communication)
 * Minimal-JSON: https://github.com/ralfstx/minimal-json (used for JSON creation and parsing)
 * natty: http://natty.joestelmach.com/ (used for natural language time parsing)
-* sunrisesunsetlib-java: https://github.com/mikereedell/sunrisesunsetlib-java (for sunrise/sunset calculations)
+* novaforjava: http://novaforjava.sourceforge.net/ & http://libnova.sourceforge.net/ (for sunrise/sunset calculations)
 * Quartz Scheduler: http://www.quartz-scheduler.org/ (used for cron-alike timer parsing)
 
 [![Build Status](https://travis-ci.org/owagner/logic4mqtt.svg)](https://travis-ci.org/owagner/logic4mqtt) Automatically built jars can be downloaded from the release page on GitHub at https://github.com/owagner/logic4mqtt/releases
@@ -123,6 +124,10 @@ prior to use.
 
 Changelog
 ---------
+* 0.12 - 2015/03/30 - owagner
+  - replaced sunrisesunsetlib-java with libnova/novaforjava
+  - API: corrected Time.isOfficial() to Time.isOfficialDaylight()
+
 * 0.11 - 2015/03/09 - owagner
   - API: it's now possible to pass Javascript objects to setValue() et.al., which will then be converted
     to JSON before publishing

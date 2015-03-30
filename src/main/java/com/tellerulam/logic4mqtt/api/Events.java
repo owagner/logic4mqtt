@@ -6,9 +6,6 @@ package com.tellerulam.logic4mqtt.api;
 
 import java.util.*;
 
-import javax.script.*;
-
-import com.eclipsesource.json.*;
 import com.tellerulam.logic4mqtt.*;
 import com.tellerulam.logic4mqtt.TopicCache.TopicValue;
 

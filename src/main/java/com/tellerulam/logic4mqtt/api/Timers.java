@@ -1,6 +1,6 @@
 package com.tellerulam.logic4mqtt.api;
 
-import java.util.logging.*;
+//import java.util.logging.*;
 
 import com.tellerulam.logic4mqtt.*;
 
@@ -26,5 +26,5 @@ public class Timers
 		return LogicTimer.remTimer(symbolicName);
 	}
 
-	private static Logger L=Logger.getLogger(Timers.class.getName());
+	//private static Logger L=Logger.getLogger(Timers.class.getName());
 }
