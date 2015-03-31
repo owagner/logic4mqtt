@@ -2,8 +2,6 @@ package com.tellerulam.logic4mqtt;
 
 import static org.junit.Assert.*;
 
-import java.util.*;
-
 import javax.script.*;
 
 import org.junit.*;

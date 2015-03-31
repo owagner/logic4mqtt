@@ -48,11 +48,11 @@ public class Time
 		if(name==null || "OFFICIAL".equalsIgnoreCase(name))
 			return Solar.LN_SOLAR_STANDART_HORIZON;
 		else if("ASTRONOMICAL".equalsIgnoreCase(name))
-			return 18;
+			return -18;
 		else if("NAUTICAL".equalsIgnoreCase(name))
-			return 12;
+			return -12;
 		else if("CIVIL".equalsIgnoreCase(name))
-			return 6;
+			return -6;
 		throw new IllegalArgumentException("Unknown zenith "+name);
 	}
 
@@ -68,7 +68,12 @@ public class Time
 	{
 		 LnDate date=new LnDate();
 		 JulianDay.ln_get_date(jd, date);
-		 return String.format("%02d:%02d",date.hours,date.minutes);
+		 Calendar utcCal=Calendar.getInstance();
+		 utcCal.setTimeZone(TimeZone.getTimeZone("UTC"));
+		 utcCal.set(date.years,date.months-1,date.days,date.hours,date.minutes,(int)date.seconds);
+		 Calendar cal=Calendar.getInstance();
+		 cal.setTimeInMillis(utcCal.getTimeInMillis());
+		 return String.format("%02d:%02d",cal.get(Calendar.HOUR_OF_DAY),cal.get(Calendar.MINUTE));
 	}
 
 	/**
@@ -86,7 +91,7 @@ public class Time
 	 * Get the Sunset time (format hh:mm) for the given Zentih
 	 *
 	 * @param zenith OFFICIAL (or null) / ASTRONOMICAL / NAUTICAL / CIVIL
-	 * @return the sunrise time
+	 * @return the sunset time
 	 */
 	public String getSunset(String zenith)
 	{
