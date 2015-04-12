@@ -195,6 +195,8 @@ public class Time
 	{
 		LnRstTime res=calcSSTimes(zenith);
 		double jd=JulianDay.ln_get_julian_from_sys();
+		if(jd<res.rise && jd<=res.set)
+			jd++;
 		return jd>=res.rise && jd<=res.set;
 	}
 
