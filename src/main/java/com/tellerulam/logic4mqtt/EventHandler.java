@@ -92,7 +92,7 @@ public class EventHandler
 			{
 				if(h.handles(topic) && h.hasDestValue(value))
 				{
-					if(!h.changeOnly || t.wasRefreshed())
+					if(!h.changeOnly || !t.wasRefreshed())
 						h.queueExecution(topic, value, t.getPreviousValue(), t.getPreviousTimestamp());
 				}
 			}

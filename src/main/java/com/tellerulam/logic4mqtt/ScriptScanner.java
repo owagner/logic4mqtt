@@ -68,6 +68,11 @@ public class ScriptScanner
 				return true;
 			}
 		});
+		if(content==null)
+		{
+			L.severe("Script directory "+dir+" does not exist, skipping");
+			return;
+		}
 		for(File f:content)
 		{
 			if(f.isDirectory())
