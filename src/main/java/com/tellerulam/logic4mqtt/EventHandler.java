@@ -105,10 +105,10 @@ public class EventHandler
 			return true;
 		Number valueAsNumber=ScriptEngineTools.convertToNumberIfPossible(value);
 		String valueAsString=null;
-		L.info("value is "+value+" "+value.getClass());
+		//L.info("value is "+value+" "+value.getClass());
 		for(Object dv:destvalues)
 		{
-			L.info("dv is "+dv+" "+dv.getClass());
+			//L.info("dv is "+dv+" "+dv.getClass());
 			if(valueAsNumber!=null && (dv instanceof Number))
 			{
 				// Numerical comparision
