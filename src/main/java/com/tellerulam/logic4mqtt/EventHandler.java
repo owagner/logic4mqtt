@@ -209,6 +209,7 @@ public class EventHandler
 			s.append("CONT");
 		else
 			s.append(expires);
+		s.append('\t');
 		s.append(callback);
 
 		return s.toString();
