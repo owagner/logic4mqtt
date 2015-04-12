@@ -92,7 +92,7 @@ public class EventHandler
 			{
 				if(h.handles(topic) && h.hasDestValue(value))
 				{
-					if(!h.changeOnly || !(value.equals(t.getPreviousValue())))
+					if(!h.changeOnly || t.wasRefreshed())
 						h.queueExecution(topic, value, t.getPreviousValue(), t.getPreviousTimestamp());
 				}
 			}
@@ -168,6 +168,7 @@ public class EventHandler
 		}
 	}
 
+	/* Currently, Nashorn is singlethreaded */
 	static final Executor eventExecutor=Executors.newFixedThreadPool(1);
 
 	static final Logger L=Logger.getLogger(EventHandler.class.getName());

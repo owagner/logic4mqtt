@@ -124,6 +124,10 @@ prior to use.
 
 Changelog
 ---------
+* 0.13 - 2015/04/12 - owagner
+  - API: onChange logic was completely broken and would retrigger
+    on every update, or not at all
+
 * 0.12 - 2015/03/30 - owagner
   - replaced sunrisesunsetlib-java with libnova/novaforjava
   - API: corrected Time.isOfficial() to Time.isOfficialDaylight()

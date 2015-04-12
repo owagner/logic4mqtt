@@ -98,30 +98,38 @@ public class TopicCache
 
 	public Object getValue()
 	{
-		return values[0].value;
+		return changedValues[0].value;
 	}
 	public Object getPreviousValue()
 	{
-		if(values[1]!=null)
-			return values[1].value;
+		if(changedValues[1]!=null)
+			return changedValues[1].value;
 		return null;
 	}
 	public Date getPreviousTimestamp()
 	{
-		if(values[1]!=null)
-			return values[1].ts;
+		if(changedValues[1]!=null)
+			return changedValues[1].ts;
 		return null;
 	}
-
+	/* Whether the last store was a refresh of the previus value */
+	public boolean wasRefreshed()
+	{
+		return lastStoreWasRefresh;
+	}
 	private void storeValue(Object newValue)
 	{
-		if(values[0]!=null && newValue.equals(values[0].value))
-		{
-			values[0].markAsRefreshed();
-			return;
-		}
 		System.arraycopy(values,0,values,1,values.length-1);
 		values[0]=new TopicValue(newValue,new Date());
+		if(changedValues[0]!=null && newValue.equals(changedValues[0].value))
+		{
+			changedValues[0].markAsRefreshed();
+			lastStoreWasRefresh=true;
+			return;
+		}
+		System.arraycopy(changedValues,0,changedValues,1,changedValues.length-1);
+		changedValues[0]=new TopicValue(newValue,new Date());
+		lastStoreWasRefresh=false;
 	}
 
 	private TopicCache(String topic)
@@ -147,7 +155,9 @@ public class TopicCache
 			lastRefresh=new Date();
 		}
 	}
-	final TopicValue values[]=new TopicValue[10];
+	private final TopicValue values[]=new TopicValue[10];
+	private final TopicValue changedValues[]=new TopicValue[10];
+	private boolean lastStoreWasRefresh;
 
 	static {
 		Main.t.schedule(new TimerTask(){

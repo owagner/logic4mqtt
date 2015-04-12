@@ -64,7 +64,8 @@ public class Time
 		return result;
 	}
 
-	private String jdToTimeString(double jd)
+	@SuppressWarnings("boxing")
+	private static String jdToTimeString(double jd)
 	{
 		 LnDate date=new LnDate();
 		 JulianDay.ln_get_date(jd, date);
