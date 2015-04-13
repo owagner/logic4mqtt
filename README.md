@@ -29,6 +29,20 @@ Dependencies
 [![Build Status](https://travis-ci.org/owagner/logic4mqtt.svg)](https://travis-ci.org/owagner/logic4mqtt) Automatically built jars can be downloaded from the release page on GitHub at https://github.com/owagner/logic4mqtt/releases
 
 
+API
+---
+logic4mqtt provides a scripting host and a support API which provides
+
+* MQTT access
+* Event handling, based on incoming MQTT messages
+* versatile Timer support with both Cron-alike and natural language syntax
+* support for Sunrise/Sunset calculations, also tied into timer support
+* utility functions for network access, Wake-On-Lan etc.
+
+The API is organized in classes. Documentation for the classes is available at
+http://owagner.github.io/logic4mqtt/apidocs/
+
+
 Topic notation
 --------------
 Various logic4mqtt functions deal with MQTT topics. To simplify topic usage in accordance with the MQTT-smarthome specification, 
