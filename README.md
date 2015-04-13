@@ -124,6 +124,9 @@ prior to use.
 
 Changelog
 ---------
+* 0.15 - 2015/04/13 - owagner
+  - API: added Time.getSunAltitude() and Time.getSunAzimuth()
+
 * 0.14 - 2015/04/13 - owagner
   - API: added cache for sunrise/sunset calculations
 

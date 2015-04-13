@@ -5,6 +5,9 @@
 
 package com.tellerulam.logic4mqtt.api;
 
+import static net.sourceforge.novaforjava.SiderealTime.ln_get_mean_sidereal_time;
+import static net.sourceforge.novaforjava.Utility.ln_deg_to_rad;
+
 import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
@@ -232,16 +235,39 @@ public class Time
 		return isDaylight(null);
 	}
 
+	/**
+	 * Calculate the Sun's Azimuth angle at the defined location
+	 * and the current moment
+	 *
+	 * @return The azimuth angle (degrees)
+	 */
 	public double getSunAzimuth()
 	{
 		LnEquPosn p=new LnEquPosn();
 		double JD=JulianDay.ln_get_julian_from_sys();
 		Solar.ln_get_solar_equ_coords(JD, p);
 		LnHrzPosn hp=new LnHrzPosn();
-		Transform.ln_get_hrz_from_equ(p,location,JD,hp);
-		return hp.az;
+		double sidereal = ln_get_mean_sidereal_time(JD);
+		Transform.ln_get_hrz_from_equ_sidereal_time(p,location,sidereal,hp);
+
+		// Calculate hour angle, again, for normalization
+		/** change sidereal_time from hours to radians */
+		sidereal *= 2.0 * Math.PI / 24.0;
+		/** calculate hour angle of object at observers position */
+		double ra = ln_deg_to_rad(p.ra);
+		double H = sidereal + ln_deg_to_rad(location.lng) - ra;
+		if(H>0)
+			return hp.az+180;
+		else
+			return hp.az;
 	}
 
+	/**
+	 * Calculate the Sun's Altitude at the defined location
+	 * and the current moment.
+	 *
+	 * @return The altitude angle (degress). May be negative if the sun has set.
+	 */
 	public double getSunAltitude()
 	{
 		LnEquPosn p=new LnEquPosn();
