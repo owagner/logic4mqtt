@@ -10,7 +10,10 @@ import java.util.logging.*;
 import java.util.regex.*;
 
 import net.sourceforge.novaforjava.JulianDay;
+import net.sourceforge.novaforjava.Transform;
 import net.sourceforge.novaforjava.api.LnDate;
+import net.sourceforge.novaforjava.api.LnEquPosn;
+import net.sourceforge.novaforjava.api.LnHrzPosn;
 import net.sourceforge.novaforjava.api.LnLnlatPosn;
 import net.sourceforge.novaforjava.api.LnRstTime;
 import net.sourceforge.novaforjava.solarsystem.Solar;
@@ -227,6 +230,26 @@ public class Time
 	public boolean isOfficialDaylight()
 	{
 		return isDaylight(null);
+	}
+
+	public double getSunAzimuth()
+	{
+		LnEquPosn p=new LnEquPosn();
+		double JD=JulianDay.ln_get_julian_from_sys();
+		Solar.ln_get_solar_equ_coords(JD, p);
+		LnHrzPosn hp=new LnHrzPosn();
+		Transform.ln_get_hrz_from_equ(p,location,JD,hp);
+		return hp.az;
+	}
+
+	public double getSunAltitude()
+	{
+		LnEquPosn p=new LnEquPosn();
+		double JD=JulianDay.ln_get_julian_from_sys();
+		Solar.ln_get_solar_equ_coords(JD, p);
+		LnHrzPosn hp=new LnHrzPosn();
+		Transform.ln_get_hrz_from_equ(p,location,JD,hp);
+		return hp.alt;
 	}
 
 	private static class SunCacheEntry
