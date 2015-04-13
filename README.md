@@ -124,6 +124,9 @@ prior to use.
 
 Changelog
 ---------
+* 0.14 - 2015/04/13 - owagner
+  - API: added cache for sunrise/sunset calculations
+
 * 0.13 - 2015/04/12 - owagner
   - API: onChange logic was completely broken and would retrigger
     on every update, or not at all

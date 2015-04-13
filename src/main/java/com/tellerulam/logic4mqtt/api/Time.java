@@ -1,9 +1,6 @@
 /*
  * This object contains utility functions to deal with Sunset/Sunrise calculations
  *
- * It is effectivly a very thin wrapper around Mike Reedell's https://github.com/mikereedell/sunrisesunsetlib-java/
- * library, which in turn implements http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
- *
  */
 
 package com.tellerulam.logic4mqtt.api;
@@ -43,7 +40,7 @@ public class Time
 		L.config("Set location for sunset calculations to "+location);
 	}
 
-	private double getZenith(String name)
+	private double getHorizon(String name)
 	{
 		if(name==null || "OFFICIAL".equalsIgnoreCase(name))
 			return Solar.LN_SOLAR_STANDART_HORIZON;
@@ -53,14 +50,14 @@ public class Time
 			return -12;
 		else if("CIVIL".equalsIgnoreCase(name))
 			return -6;
-		throw new IllegalArgumentException("Unknown zenith "+name);
+		throw new IllegalArgumentException("Unknown horizon "+name);
 	}
 
-	private LnRstTime calcSSTimes(String zenith)
+	private LnRstTime calcSSTimes(String horizon)
 	{
 		double jd=JulianDay.ln_get_julian_from_sys();
 		LnRstTime result=new LnRstTime();
-		Solar.ln_get_solar_rst_horizon(jd, location, getZenith(zenith), result);
+		Solar.ln_get_solar_rst_horizon(jd, location, getHorizon(horizon), result);
 		return result;
 	}
 
@@ -80,28 +77,28 @@ public class Time
 	/**
 	 * Get the Sunrise time (format hh:mm) for the given Zentih
 	 *
-	 * @param zenith OFFICIAL (or null) / ASTRONOMICAL / NAUTICAL / CIVIL
+	 * @param horizon OFFICIAL (or null) / ASTRONOMICAL / NAUTICAL / CIVIL
 	 * @return the sunrise time
 	 */
-	public String getSunrise(String zenith)
+	public String getSunrise(String horizon)
 	{
-		LnRstTime res=calcSSTimes(zenith);
-		return jdToTimeString(res.rise);
+		SunCacheEntry sce=getSunriseSunsetTime(horizon);
+		return sce.sunrise;
 	}
 	/**
 	 * Get the Sunset time (format hh:mm) for the given Zentih
 	 *
-	 * @param zenith OFFICIAL (or null) / ASTRONOMICAL / NAUTICAL / CIVIL
+	 * @param horizon OFFICIAL (or null) / ASTRONOMICAL / NAUTICAL / CIVIL
 	 * @return the sunset time
 	 */
-	public String getSunset(String zenith)
+	public String getSunset(String horizon)
 	{
-		LnRstTime res=calcSSTimes(zenith);
-		return jdToTimeString(res.set);
+		SunCacheEntry sce=getSunriseSunsetTime(horizon);
+		return sce.sunset;
 	}
 
 	/**
-	 * Shortcut for getSunrise() with the given zenith
+	 * Shortcut for getSunrise() with the given horizon
 	 * @return the sunrise time
 	 *
 	 * @see getSunrise
@@ -111,7 +108,7 @@ public class Time
 		return getSunrise("ASTRONOMICAL");
 	}
 	/**
-	 * Shortcut for getSunset() with the given zenith
+	 * Shortcut for getSunset() with the given horizon
 	 * @return the sunset time
 	 *
 	 * @see getSunset
@@ -122,7 +119,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut for getSunrise() with the given zenith
+	 * Shortcut for getSunrise() with the given horizon
 	 * @return the sunrise time
 	 *
 	 * @see getSunrise
@@ -132,7 +129,7 @@ public class Time
 		return getSunrise("NAUTICAL");
 	}
 	/**
-	 * Shortcut for getSunset() with the given zenith
+	 * Shortcut for getSunset() with the given horizon
 	 * @return the sunset time
 	 *
 	 * @see getSunset
@@ -143,7 +140,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut for getSunrise() with the given zenith
+	 * Shortcut for getSunrise() with the given horizon
 	 * @return the sunrise time
 	 *
 	 * @see getSunrise
@@ -153,7 +150,7 @@ public class Time
 		return getSunrise("CIVIL");
 	}
 	/**
-	 * Shortcut for getSunset() with the given zenith
+	 * Shortcut for getSunset() with the given horizon
 	 * @return the sunset time
 	 *
 	 * @see getSunset
@@ -164,7 +161,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut for getSunrise() with the given zenith
+	 * Shortcut for getSunrise() with the given horizon
 	 * @return the sunrise time
 	 *
 	 * @see getSunrise
@@ -174,7 +171,7 @@ public class Time
 		return getSunrise(null);
 	}
 	/**
-	 * Shortcut for getSunset() with the given zenith
+	 * Shortcut for getSunset() with the given horizon
 	 * @return the sunset time
 	 *
 	 * @see getSunset
@@ -185,23 +182,19 @@ public class Time
 	}
 
 	/**
-	 * Determine whether we're currently having daylight according to the given zenith
+	 * Determine whether we're currently having daylight according to the given horizon
 	 *
-	 * @param zenith
+	 * @param horizon
 	 * @return whether it is currently daylight
 	 */
 
-	public boolean isDaylight(String zenith)
+	public boolean isDaylight(String horizon)
 	{
-		LnRstTime res=calcSSTimes(zenith);
-		double jd=JulianDay.ln_get_julian_from_sys();
-		if(jd<res.rise && jd<=res.set)
-			jd++;
-		return jd>=res.rise && jd<=res.set;
+		return isBetween(getSunrise(horizon),getSunset(horizon));
 	}
 
 	/**
-	 * Shortcut to isDaylight() with the given zenith
+	 * Shortcut to isDaylight() with the given horizon
 	 * @return whether it is currently daylight
 	 */
 	public boolean isCivilDaylight()
@@ -210,7 +203,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut to isDaylight() with the given zenith
+	 * Shortcut to isDaylight() with the given horizon
 	 * @return whether it is currently daylight
 	 */
 	public boolean isNauticalDaylight()
@@ -219,7 +212,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut to isDaylight() with the given zenith
+	 * Shortcut to isDaylight() with the given horizon
 	 * @return whether it is currently daylight
 	 */
 	public boolean isAstronomicalDaylight()
@@ -228,12 +221,50 @@ public class Time
 	}
 
 	/**
-	 * Shortcut to isDaylight() with the given zenith
+	 * Shortcut to isDaylight() with the given horizon
 	 * @return whether it is currently daylight
 	 */
 	public boolean isOfficialDaylight()
 	{
 		return isDaylight(null);
+	}
+
+	private static class SunCacheEntry
+	{
+		final String sunrise;
+		final String sunset;
+		SunCacheEntry(String sunrise, String sunset)
+		{
+			this.sunrise = sunrise;
+			this.sunset = sunset;
+		}
+	}
+	private static final Map<String,SunCacheEntry> sunCache=new HashMap<>();
+	private static long sunCacheValidUntil;
+
+	private synchronized SunCacheEntry getSunriseSunsetTime(String horizon)
+	{
+		long now=System.currentTimeMillis();
+		if(now>=sunCacheValidUntil)
+		{
+			sunCache.clear();
+			// Newly calculated values will be valid until midnight tomorrow
+			Calendar cnow=Calendar.getInstance();
+			cnow.add(Calendar.DAY_OF_YEAR, 1);
+			cnow.set(Calendar.HOUR_OF_DAY, 0);
+			cnow.set(Calendar.MINUTE, 0);
+			cnow.set(Calendar.SECOND, 0);
+			cnow.set(Calendar.MILLISECOND, 0);
+			sunCacheValidUntil=cnow.getTimeInMillis();
+		}
+		SunCacheEntry sc=sunCache.get(horizon);
+		if(sc==null)
+		{
+			LnRstTime res=calcSSTimes(horizon);
+			sc=new SunCacheEntry(jdToTimeString(res.rise),jdToTimeString(res.set));
+			sunCache.put(horizon, sc);
+		}
+		return sc;
 	}
 
 	private final Pattern timeSpecPattern=Pattern.compile("([0-9]{1,2}):([0-9]{1,2})(?:\\:([0-9]{1,2}))?");
