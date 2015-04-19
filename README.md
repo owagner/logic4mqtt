@@ -138,6 +138,12 @@ prior to use.
 
 Changelog
 ---------
+* 0.16 - 2015/04/20 - owagner
+  - API: Fixed a bug in natty timers with sunset-relative specifications -- since sunset/sunrise
+    times change upon rescheduling, it was possible that the next scheduled run was just a few minutes
+    after the last one. This made the check to make sure that timers are rerun on the next day
+    ineffective, and could cause such timers to trigger twice a day.
+  
 * 0.15 - 2015/04/13 - owagner
   - API: added Time.getSunAltitude() and Time.getSunAzimuth()
 

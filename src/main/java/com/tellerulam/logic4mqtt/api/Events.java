@@ -194,7 +194,7 @@ public class Events
 	 * Queue an update to the specified topic with the given value at timespec.
 	 *
 	 * This is effectivly a shortcut for adding a timer which sets the value,
-	 * with a symbolic name of _SET_<topic>
+	 * with a symbolic name of _SET_topic
 	 *
 	 * @param timespec the timer spec
 	 * @param topic the topic to publish to
@@ -218,7 +218,7 @@ public class Events
 	 * with the retain flag set to true.
 	 *
 	 * This is effectivly a shortcut for adding a timer which sets the value,
-	 * with a symbolic name of _SET_<topic>
+	 * with a symbolic name of _SET_topic
 	 *
 	 * @param timespec the timer spec
 	 * @param topic the topic to publish to

@@ -137,8 +137,22 @@ public class NattyTimer extends LogicTimer
 			return false;
 		}
 
+		/*
+		 * With a sunset/sunrise relative pattern, the re-scheduling
+		 * may have ended up a few minutes in the future, which causes or
+		 * simple retrigger-on-next-day check to fail. So we make sure or
+		 * next run is at least 12 hours in the future.
+		 */
+		Date mustBeLaterThan=now;
+		if(needToCheckSunpatterns)
+		{
+			Calendar cal=Calendar.getInstance();
+			cal.add(Calendar.HOUR_OF_DAY,12);
+			mustBeLaterThan=cal.getTime();
+		}
+
 		Date nextrun=dates.get(dateIndex++);
-		if(now.after(nextrun))
+		if(mustBeLaterThan.after(nextrun))
 		{
 			// Reschedule on next day
 			Calendar cal=Calendar.getInstance();
