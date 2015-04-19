@@ -11,11 +11,11 @@ import com.tellerulam.logic4mqtt.TopicCache.TopicValue;
 
 public class Events
 {
-	private static final Events instance=new Events();
+	static final Events instance=new Events();
 
-	public static Events getInstance()
+	private Events()
 	{
-		return instance;
+		/* Keep private */
 	}
 
 	/**

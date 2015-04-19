@@ -14,7 +14,7 @@ public class CmdTimes extends Cmd
 	@Override
 	public void exec(PrintWriter w, ArgSplitter args) throws Exception
 	{
-		Time t=Time.getInstance();
+		Time t=InstanceManager.getTimeInstance();
 		final String zeniths[]={"ASTRONOMICAL","NAUTICAL","CIVIL","OFFICIAL"};
 		for(String zenith:zeniths)
 		{

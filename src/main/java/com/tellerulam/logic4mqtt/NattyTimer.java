@@ -36,7 +36,7 @@ public class NattyTimer extends LogicTimer
 	/* Overridable for unit testing only */
 	protected Time getTimeInstance()
 	{
-		return Time.getInstance();
+		return InstanceManager.getTimeInstance();
 	}
 
 	public static class ParsedSpec

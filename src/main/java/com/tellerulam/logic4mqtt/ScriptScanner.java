@@ -40,10 +40,10 @@ public class ScriptScanner
 			if(se!=null)
 			{
 				// Configure the engine
-				se.put("Events", Events.getInstance());
-				se.put("Timers", Timers.getInstance());
-				se.put("Utilities", Utilities.getInstance());
-				se.put("Time", Time.getInstance());
+				se.put("Events", InstanceManager.getEventsInstance());
+				se.put("Timers", InstanceManager.getTimersInstance());
+				se.put("Utilities", InstanceManager.getUtilitiesInstance());
+				se.put("Time", InstanceManager.getTimeInstance());
 				engines.put(ext,se);
 			}
 		}

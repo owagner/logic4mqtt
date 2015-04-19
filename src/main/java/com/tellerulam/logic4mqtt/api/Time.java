@@ -23,7 +23,13 @@ import net.sourceforge.novaforjava.solarsystem.Solar;
 
 public class Time
 {
-	private static final Time instance=new Time();
+	static final Time instance=new Time();
+
+	private Time()
+	{
+		/* Keep private */
+	}
+
 
 	private LnLnlatPosn location=new LnLnlatPosn();
 	{
@@ -380,11 +386,6 @@ public class Time
 			throw new IllegalArgumentException("End time "+timespec2+" before start time "+timespec1);
 		Calendar now=getNow();
 		return cal_start.before(now) && cal_end.after(now);
-	}
-
-	public static Time getInstance()
-	{
-		return instance;
 	}
 
 	private static Logger L=Logger.getLogger(Time.class.getName());

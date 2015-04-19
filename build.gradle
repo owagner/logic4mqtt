@@ -40,7 +40,9 @@ jar {
 }
 
 task generateApiDocs(type: Javadoc) {	
-	source = fileTree("src/main/java/com/tellerulam/logic4mqtt/api")
+	source = fileTree("src/main/java/com/tellerulam/logic4mqtt/api").matching {
+		exclude "InstanceManager.java"
+	}
 	destinationDir = file("apidocs")
 	options.setMemberLevel(JavadocMemberLevel.PUBLIC)
 }

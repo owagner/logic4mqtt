@@ -13,11 +13,10 @@ import java.util.logging.*;
 
 public class Utilities
 {
-	private static final Utilities instance=new Utilities();
-
-	public static Utilities getInstance()
+	static final Utilities instance=new Utilities();
+	private Utilities()
 	{
-		return instance;
+		/* Keep private */
 	}
 
 	/**

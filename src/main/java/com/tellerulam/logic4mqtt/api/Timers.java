@@ -6,11 +6,10 @@ import com.tellerulam.logic4mqtt.*;
 
 public class Timers
 {
-	private static final Timers instance=new Timers();
-
-	public static Timers getInstance()
+	static final Timers instance=new Timers();
+	private Timers()
 	{
-		return instance;
+		/* Keep private */
 	}
 
 	public void addTimer(String symbolicName,String timespec,TimerCallbackInterface callback,Object userdata)
