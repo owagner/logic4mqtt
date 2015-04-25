@@ -2,6 +2,8 @@ package com.tellerulam.logic4mqtt;
 
 import static org.junit.Assert.*;
 
+import java.util.*;
+
 import javax.script.*;
 
 import org.junit.*;
@@ -14,10 +16,17 @@ public class ScriptEngineToolsTest
 		{
 			return ScriptEngineTools.encodeAsJSON(json);
 		}
-		public String dotest(Object val)
+		public String dotest(Map<String,Object> val)
 		{
-			return val.toString();
+			return ScriptEngineTools.encodeAsJSON(val);
 		}
+		@SuppressWarnings("boxing")
+		public String dotest(double d)
+		{
+			if(d == (long) d)
+		        return String.format("%d",(long)d);
+		    else
+		        return String.format("%s",d);		}
 	}
 
 	@Test

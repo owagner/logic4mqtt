@@ -98,6 +98,10 @@ public class ScriptEngineTools
 			{
 				jso.add(me.getKey(),mapToJSO((Bindings)me.getValue()));
 			}
+			else if(v instanceof Map)
+			{
+				jso.add(me.getKey(),mapToJSO((Map<String,Object>)me.getValue()));
+			}
 			else if(v instanceof Collection)
 			{
 				JsonArray arr=new JsonArray();
