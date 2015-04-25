@@ -16,13 +16,13 @@ repositories {
 dependencies {
 	compile 'com.eclipsesource.minimal-json:minimal-json:0.9.1'
 	compile 'org.eclipse.paho:mqtt-client:0.4.0'
-	compile 'net.sourceforge.novaforjava:novaforjava:0.15.0.0'
 	compile 'org.quartz-scheduler:quartz:2.2.1'
 	compile('com.joestelmach:natty:0.9') {
 		exclude module: 'antlr'
 		exclude module: 'backport-util-concurrent'
 		exclude module: 'stringtemplate'
 	}
+	testCompile 'junit:junit:4.11'
 }
 
 task listJars << {

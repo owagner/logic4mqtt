@@ -23,7 +23,6 @@ Dependencies
 * Eclipse Paho: https://www.eclipse.org/paho/clients/java/ (used for MQTT communication)
 * Minimal-JSON: https://github.com/ralfstx/minimal-json (used for JSON creation and parsing)
 * natty: http://natty.joestelmach.com/ (used for natural language time parsing)
-* novaforjava: http://novaforjava.sourceforge.net/ & http://libnova.sourceforge.net/ (for sunrise/sunset calculations)
 * Quartz Scheduler: http://www.quartz-scheduler.org/ (used for cron-alike timer parsing)
 
 [![Build Status](https://travis-ci.org/owagner/logic4mqtt.svg)](https://travis-ci.org/owagner/logic4mqtt) Automatically built jars can be downloaded from the release page on GitHub at https://github.com/owagner/logic4mqtt/releases
@@ -138,6 +137,9 @@ prior to use.
 
 Changelog
 ---------
+* 0.17 - 2015/04/20 - owagner
+  - replaced libnova with custom routines; fixed sun azimuth calculations, and improved caching
+
 * 0.16 - 2015/04/20 - owagner
   - API: Fixed a bug in natty timers with sunset-relative specifications -- since sunset/sunrise
     times change upon rescheduling, it was possible that the next scheduled run was just a few minutes

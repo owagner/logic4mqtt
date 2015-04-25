@@ -5,36 +5,19 @@
 
 package com.tellerulam.logic4mqtt.api;
 
-import static net.sourceforge.novaforjava.SiderealTime.ln_get_mean_sidereal_time;
-import static net.sourceforge.novaforjava.Utility.ln_deg_to_rad;
-
 import java.util.*;
 import java.util.logging.*;
 import java.util.regex.*;
 
-import net.sourceforge.novaforjava.JulianDay;
-import net.sourceforge.novaforjava.Transform;
-import net.sourceforge.novaforjava.api.LnDate;
-import net.sourceforge.novaforjava.api.LnEquPosn;
-import net.sourceforge.novaforjava.api.LnHrzPosn;
-import net.sourceforge.novaforjava.api.LnLnlatPosn;
-import net.sourceforge.novaforjava.api.LnRstTime;
-import net.sourceforge.novaforjava.solarsystem.Solar;
+import com.tellerulam.logic4mqtt.*;
 
 public class Time
 {
 	static final Time instance=new Time();
 
-	private Time()
+	protected Time()
 	{
 		/* Keep private */
-	}
-
-
-	private LnLnlatPosn location=new LnLnlatPosn();
-	{
-		location.lat=51.358813;
-		location.lng=7.241483;
 	}
 
 	/**
@@ -43,74 +26,68 @@ public class Time
 	 * @param latitude
 	 * @param longitude
 	 */
-	public synchronized void setLocation(String latitude,String longitude)
+	public synchronized void setLocation(double latitude,double longitude)
 	{
-		LnLnlatPosn newLocation=new LnLnlatPosn();
-		newLocation.lat=Double.parseDouble(latitude);
-		newLocation.lng=Double.parseDouble(longitude);
-		location=newLocation;
-		L.config("Set location for sunset calculations to "+location);
+		SunCalc.setLatLng(latitude, longitude);
+		L.config("Set location for sunset calculations to "+latitude+" "+longitude);
 	}
 
-	private double getHorizon(String name)
-	{
-		if(name==null || "OFFICIAL".equalsIgnoreCase(name))
-			return Solar.LN_SOLAR_STANDART_HORIZON;
-		else if("ASTRONOMICAL".equalsIgnoreCase(name))
-			return -18;
-		else if("NAUTICAL".equalsIgnoreCase(name))
-			return -12;
-		else if("CIVIL".equalsIgnoreCase(name))
-			return -6;
-		throw new IllegalArgumentException("Unknown horizon "+name);
-	}
-
-	private LnRstTime calcSSTimes(String horizon)
-	{
-		double jd=JulianDay.ln_get_julian_from_sys();
-		LnRstTime result=new LnRstTime();
-		Solar.ln_get_solar_rst_horizon(jd, location, getHorizon(horizon), result);
-		return result;
-	}
-
-	@SuppressWarnings("boxing")
-	private static String jdToTimeString(double jd)
-	{
-		 LnDate date=new LnDate();
-		 JulianDay.ln_get_date(jd, date);
-		 Calendar utcCal=Calendar.getInstance();
-		 utcCal.setTimeZone(TimeZone.getTimeZone("UTC"));
-		 utcCal.set(date.years,date.months-1,date.days,date.hours,date.minutes,(int)date.seconds);
-		 Calendar cal=Calendar.getInstance();
-		 cal.setTimeInMillis(utcCal.getTimeInMillis());
-		 return String.format("%02d:%02d",cal.get(Calendar.HOUR_OF_DAY),cal.get(Calendar.MINUTE));
-	}
 
 	/**
-	 * Get the Sunrise time (format hh:mm) for the given Zentih
+	 * Get the Sunrise time (format hh:mm) for the given phase
 	 *
-	 * @param horizon OFFICIAL (or null) / ASTRONOMICAL / NAUTICAL / CIVIL
+	 * @param phase DAYLIGHT (or null), OFFICIAL / ASTRONOMICAL / NAUTICAL / CIVIL
 	 * @return the sunrise time
 	 */
-	public String getSunrise(String horizon)
+	public String getSunrise(String phase)
 	{
-		SunCacheEntry sce=getSunriseSunsetTime(horizon);
-		return sce.sunrise;
+		SunCalc.DayInfo di=SunCalc.getDayInfo();
+		int m;
+
+		if(phase==null || "DAYLIGHT".equals(phase))
+			m=di.sunrise[4];
+		else if("OFFICIAL".equals(phase))
+			m=di.sunrise[3];
+		else if("CIVIL".equals(phase))
+			m=di.sunrise[2];
+		else if("NAUTICAL".equals(phase))
+			m=di.sunrise[1];
+		else if("ASTRONOMICAL".equals(phase))
+			m=di.sunrise[0];
+		else
+			throw new IllegalArgumentException("Unknown phase "+phase);
+
+		return SunCalc.makeTimeString(m);
 	}
 	/**
-	 * Get the Sunset time (format hh:mm) for the given Zentih
+	 * Get the Sunset time (format hh:mm) for the given phase
 	 *
-	 * @param horizon OFFICIAL (or null) / ASTRONOMICAL / NAUTICAL / CIVIL
+	 * @param phase DAYLIGHT (or null), OFFICIAL / ASTRONOMICAL / NAUTICAL / CIVIL
 	 * @return the sunset time
 	 */
-	public String getSunset(String horizon)
+	public String getSunset(String phase)
 	{
-		SunCacheEntry sce=getSunriseSunsetTime(horizon);
-		return sce.sunset;
+		SunCalc.DayInfo di=SunCalc.getDayInfo();
+		int m;
+
+		if(phase==null || "DAYLIGHT".equals(phase))
+			m=di.sunset[0];
+		else if("OFFICIAL".equals(phase))
+			m=di.sunset[1];
+		else if("CIVIL".equals(phase))
+			m=di.sunset[2];
+		else if("NAUTICAL".equals(phase))
+			m=di.sunset[3];
+		else if("ASTRONOMICAL".equals(phase))
+			m=di.sunset[4];
+		else
+			throw new IllegalArgumentException("Unknown phase "+phase);
+
+		return SunCalc.makeTimeString(m);
 	}
 
 	/**
-	 * Shortcut for getSunrise() with the given horizon
+	 * Shortcut for getSunrise() with the given phase
 	 * @return the sunrise time
 	 *
 	 * @see getSunrise
@@ -120,7 +97,7 @@ public class Time
 		return getSunrise("ASTRONOMICAL");
 	}
 	/**
-	 * Shortcut for getSunset() with the given horizon
+	 * Shortcut for getSunset() with the given phase
 	 * @return the sunset time
 	 *
 	 * @see getSunset
@@ -131,7 +108,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut for getSunrise() with the given horizon
+	 * Shortcut for getSunrise() with the given phase
 	 * @return the sunrise time
 	 *
 	 * @see getSunrise
@@ -141,7 +118,7 @@ public class Time
 		return getSunrise("NAUTICAL");
 	}
 	/**
-	 * Shortcut for getSunset() with the given horizon
+	 * Shortcut for getSunset() with the given phase
 	 * @return the sunset time
 	 *
 	 * @see getSunset
@@ -152,7 +129,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut for getSunrise() with the given horizon
+	 * Shortcut for getSunrise() with the given phase
 	 * @return the sunrise time
 	 *
 	 * @see getSunrise
@@ -162,7 +139,7 @@ public class Time
 		return getSunrise("CIVIL");
 	}
 	/**
-	 * Shortcut for getSunset() with the given horizon
+	 * Shortcut for getSunset() with the given phase
 	 * @return the sunset time
 	 *
 	 * @see getSunset
@@ -173,7 +150,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut for getSunrise() with the given horizon
+	 * Shortcut for getSunrise() with the given phase
 	 * @return the sunrise time
 	 *
 	 * @see getSunrise
@@ -183,7 +160,7 @@ public class Time
 		return getSunrise(null);
 	}
 	/**
-	 * Shortcut for getSunset() with the given horizon
+	 * Shortcut for getSunset() with the given phase
 	 * @return the sunset time
 	 *
 	 * @see getSunset
@@ -192,6 +169,28 @@ public class Time
 	{
 		return getSunset(null);
 	}
+
+	/**
+	 * Shortcut for getSunrise() for beginning of sunset
+	 * @return the sunrise time
+	 *
+	 * @see getSunrise
+	 */
+	public String getSunrise()
+	{
+		return getSunrise(null);
+	}
+	/**
+	 * Shortcut for getSunset() for beginning of sunset
+	 * @return the sunset time
+	 *
+	 * @see getSunset
+	 */
+	public String getSunset()
+	{
+		return getSunset(null);
+	}
+
 
 	/**
 	 * Determine whether we're currently having daylight according to the given horizon
@@ -206,7 +205,16 @@ public class Time
 	}
 
 	/**
-	 * Shortcut to isDaylight() with the given horizon
+	 * Shortcut to isDaylight() for full daylight
+	 * @return whether it is currently daylight
+	 */
+	public boolean isDaylight()
+	{
+		return isDaylight(null);
+	}
+
+	/**
+	 * Shortcut to isDaylight() with the given phase
 	 * @return whether it is currently daylight
 	 */
 	public boolean isCivilDaylight()
@@ -215,7 +223,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut to isDaylight() with the given horizon
+	 * Shortcut to isDaylight() with the given phase
 	 * @return whether it is currently daylight
 	 */
 	public boolean isNauticalDaylight()
@@ -224,7 +232,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut to isDaylight() with the given horizon
+	 * Shortcut to isDaylight() with the given phase
 	 * @return whether it is currently daylight
 	 */
 	public boolean isAstronomicalDaylight()
@@ -233,7 +241,7 @@ public class Time
 	}
 
 	/**
-	 * Shortcut to isDaylight() with the given horizon
+	 * Shortcut to isDaylight() with the given phase
 	 * @return whether it is currently daylight
 	 */
 	public boolean isOfficialDaylight()
@@ -249,23 +257,7 @@ public class Time
 	 */
 	public double getSunAzimuth()
 	{
-		LnEquPosn p=new LnEquPosn();
-		double JD=JulianDay.ln_get_julian_from_sys();
-		Solar.ln_get_solar_equ_coords(JD, p);
-		LnHrzPosn hp=new LnHrzPosn();
-		double sidereal = ln_get_mean_sidereal_time(JD);
-		Transform.ln_get_hrz_from_equ_sidereal_time(p,location,sidereal,hp);
-
-		// Calculate hour angle, again, for normalization
-		/** change sidereal_time from hours to radians */
-		sidereal *= 2.0 * Math.PI / 24.0;
-		/** calculate hour angle of object at observers position */
-		double ra = ln_deg_to_rad(p.ra);
-		double H = sidereal + ln_deg_to_rad(location.lng) - ra;
-		if(H>0)
-			return hp.az+180;
-		else
-			return hp.az;
+		return SunCalc.getPositionInfo().azimuth;
 	}
 
 	/**
@@ -276,51 +268,9 @@ public class Time
 	 */
 	public double getSunAltitude()
 	{
-		LnEquPosn p=new LnEquPosn();
-		double JD=JulianDay.ln_get_julian_from_sys();
-		Solar.ln_get_solar_equ_coords(JD, p);
-		LnHrzPosn hp=new LnHrzPosn();
-		Transform.ln_get_hrz_from_equ(p,location,JD,hp);
-		return hp.alt;
+		return SunCalc.getPositionInfo().altitude;
 	}
 
-	private static class SunCacheEntry
-	{
-		final String sunrise;
-		final String sunset;
-		SunCacheEntry(String sunrise, String sunset)
-		{
-			this.sunrise = sunrise;
-			this.sunset = sunset;
-		}
-	}
-	private static final Map<String,SunCacheEntry> sunCache=new HashMap<>();
-	private static long sunCacheValidUntil;
-
-	private synchronized SunCacheEntry getSunriseSunsetTime(String horizon)
-	{
-		long now=System.currentTimeMillis();
-		if(now>=sunCacheValidUntil)
-		{
-			sunCache.clear();
-			// Newly calculated values will be valid until midnight tomorrow
-			Calendar cnow=Calendar.getInstance();
-			cnow.add(Calendar.DAY_OF_YEAR, 1);
-			cnow.set(Calendar.HOUR_OF_DAY, 0);
-			cnow.set(Calendar.MINUTE, 0);
-			cnow.set(Calendar.SECOND, 0);
-			cnow.set(Calendar.MILLISECOND, 0);
-			sunCacheValidUntil=cnow.getTimeInMillis();
-		}
-		SunCacheEntry sc=sunCache.get(horizon);
-		if(sc==null)
-		{
-			LnRstTime res=calcSSTimes(horizon);
-			sc=new SunCacheEntry(jdToTimeString(res.rise),jdToTimeString(res.set));
-			sunCache.put(horizon, sc);
-		}
-		return sc;
-	}
 
 	private final Pattern timeSpecPattern=Pattern.compile("([0-9]{1,2}):([0-9]{1,2})(?:\\:([0-9]{1,2}))?");
 	private Calendar parseTimeSpec(String timespec)

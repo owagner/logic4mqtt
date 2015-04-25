@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.util.*;
 
+
 import org.junit.*;
 
 public class TimeTest
@@ -11,14 +12,16 @@ public class TimeTest
 	@Test
 	public void testSunset()
 	{
-		Time t=Time.getInstance();
+		Time t=InstanceManager.getTimeInstance();
 
-		String hor[]={"OFFICIAL","CIVIL","NAUTICAL","ASTRONOMICAL"};
+		String hor[]={"DAYLIGHT","OFFICIAL","CIVIL","NAUTICAL","ASTRONOMICAL"};
 		for(String h:hor)
 		{
 			System.out.println(h+" SUNRISE: "+t.getSunrise(h));
 			System.out.println(h+" SUNSET: "+t.getSunset(h));
 		}
+		System.out.println("AZIMUTH:"+t.getSunAzimuth());
+		System.out.println("ALTITUDE:"+t.getSunAltitude());
 	}
 
 	private Time prepareTimeForTest()
@@ -27,7 +30,7 @@ public class TimeTest
 		tst.set(Calendar.HOUR_OF_DAY, 14);
 		tst.set(Calendar.MINUTE, 23);
 		Time.fixedNow=tst;
-		return Time.getInstance();
+		return InstanceManager.getTimeInstance();
 	}
 
 	@Test
