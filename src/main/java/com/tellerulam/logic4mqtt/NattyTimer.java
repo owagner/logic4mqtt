@@ -76,12 +76,15 @@ public class NattyTimer extends LogicTimer
 				String replacement=null;
 
 				boolean rise=m.group(2).equals("sunrise");
-				char type='o';
+				char type='d';
 				if(m.group(1)!=null)
 					type=m.group(1).charAt(0);
 				Time ss=getTimeInstance();
 				switch(type)
 				{
+					case 'd':
+						replacement=(rise)?ss.getSunrise():ss.getSunset();
+						break;
 					case 'c':
 						replacement=(rise)?ss.getCivilSunrise():ss.getCivilSunset();
 						break;

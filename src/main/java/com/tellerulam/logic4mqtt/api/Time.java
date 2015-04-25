@@ -1,8 +1,3 @@
-/*
- * This object contains utility functions to deal with Sunset/Sunrise calculations
- *
- */
-
 package com.tellerulam.logic4mqtt.api;
 
 import java.util.*;
@@ -11,6 +6,38 @@ import java.util.regex.*;
 
 import com.tellerulam.logic4mqtt.*;
 
+/**
+ * The Time class contains methods for solar event calculations and simple time comparisions.
+ *
+ * <h3>Solar event calculations and sun position</h3>
+ *
+ * <p>In order to make accurate solar calculations, it is necessary to
+ * set the location. Call the setLocation() method with the latitude
+ * and longitude of the location of the system. A simple way to
+ * obtain latitude and longitude from an address is using
+ * <a href="https://www.bing.com/maps/">https://www.bing.com/maps/</a></p>
+ *
+ * <p>Twilight and Sunrise/Sunset times are calculated for various phases:</p>
+ *
+ * <ul>
+ * <li>night
+ * <li>ASTRONOMICAL twilight
+ * <li>NAUTICAL twilight
+ * <li>CIVIL twilight
+ * <li>OFFICIAL sunrise
+ * <li>...day...
+ * <li>OFFICIAL sunset
+ * <li>CIVIL twilight
+ * <li>NAUTICAL twilight
+ * <li>ASTRONOMICAL twilight
+ * <li>night
+ * </ul>
+ *
+ *  <p>The methods getSunrise() and getSunset() optionally accept a phase specifier
+ *  to calculate the time for the given phase. If no phase is specified,
+ *  getSunrise() calculates the <b>end</b> of sunrise, and getSunset() the <b>start</b> of sunset.</p>
+ *
+ */
 public class Time
 {
 	static final Time instance=new Time();

@@ -9,6 +9,10 @@ import java.util.*;
 import com.tellerulam.logic4mqtt.*;
 import com.tellerulam.logic4mqtt.TopicCache.TopicValue;
 
+/**
+ * This class manages event handlers.
+ *
+ */
 public class Events
 {
 	static final Events instance=new Events();

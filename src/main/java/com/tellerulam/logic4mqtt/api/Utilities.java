@@ -11,6 +11,10 @@ import java.nio.charset.*;
 import java.util.*;
 import java.util.logging.*;
 
+/**
+ * Various utility functions.
+ *
+ */
 public class Utilities
 {
 	static final Utilities instance=new Utilities();

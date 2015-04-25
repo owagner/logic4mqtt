@@ -4,6 +4,10 @@ package com.tellerulam.logic4mqtt.api;
 
 import com.tellerulam.logic4mqtt.*;
 
+/**
+ * This class manages event timers.
+ *
+ */
 public class Timers
 {
 	static final Timers instance=new Timers();
