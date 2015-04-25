@@ -74,6 +74,7 @@ public class CmdlineHandler extends Thread
 		String cmdline=null;
 		try
 		{
+			s.setKeepAlive(true);
 			br=new BufferedReader(new InputStreamReader(s.getInputStream()));
 			w=new PrintWriter(s.getOutputStream(),true);
 			w.println("logic4mqtt V"+Main.getVersion()+" - use HELP for list of commands");
