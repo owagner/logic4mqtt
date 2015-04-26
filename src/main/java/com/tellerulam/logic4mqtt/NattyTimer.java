@@ -147,7 +147,7 @@ public class NattyTimer extends LogicTimer
 		 * next run is at least 12 hours in the future.
 		 */
 		Date mustBeLaterThan=now;
-		if(needToCheckSunpatterns)
+		if(needToCheckSunpatterns && rescheduling)
 		{
 			Calendar cal=Calendar.getInstance();
 			cal.add(Calendar.HOUR_OF_DAY,12);
