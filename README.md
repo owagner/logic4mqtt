@@ -139,6 +139,8 @@ Changelog
 ---------
 * 0.17 - 2015/04/20 - owagner
   - replaced libnova with custom routines; fixed sun azimuth calculations, and improved caching
+  - API: fixed initial scheduling of solar event related timers; since 0.16, the first scheduling
+    could unintentionally be moved to the next day.
 
 * 0.16 - 2015/04/20 - owagner
   - API: Fixed a bug in natty timers with sunset-relative specifications -- since sunset/sunrise

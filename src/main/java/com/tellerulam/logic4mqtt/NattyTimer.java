@@ -27,7 +27,7 @@ public class NattyTimer extends LogicTimer
 	@Override
 	public void start()
 	{
-		schedule();
+		schedule(false);
 	}
 	//private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |civil )?(sunset|sunrise)(\\s?(\\+|\\-)\\s?([0-9]+)\\s?(s|m|h)\\w*)?");
 	private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |civil )?(sunset|sunrise)");
@@ -118,7 +118,7 @@ public class NattyTimer extends LogicTimer
 		dateIndex=0;
 	}
 
-	private boolean schedule()
+	private boolean schedule(boolean rescheduling)
 	{
 		if(canceled)
 			return false;
@@ -134,7 +134,7 @@ public class NattyTimer extends LogicTimer
 					return false;
 				// Reparse time
 				parseTime();
-				return schedule();
+				return schedule(true);
 			}
 			removeOneTimer(this);
 			return false;
@@ -171,7 +171,7 @@ public class NattyTimer extends LogicTimer
 				if(canceled)
 					return;
 				runCallback();
-				schedule();
+				schedule(true);
 			}
 		},nextrun);
 		L.info("Scheduled "+this+" for "+nextrun);
