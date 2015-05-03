@@ -16,7 +16,8 @@ public class NattyTimer extends LogicTimer
 	private int dateIndex;
 	private boolean recurrence;
 	private Date recursUntil;
-	private boolean needToCheckSunpatterns=true;
+	private boolean needToCheckSunpatterns=true,needToCheckRandomizePattern=true;
+	private int randomizeAmount;
 
 	protected NattyTimer(String symbolicName, String timespec, TimerCallbackInterface callback, Object userdata)
 	{
@@ -32,6 +33,7 @@ public class NattyTimer extends LogicTimer
 	//private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |civil )?(sunset|sunrise)(\\s?(\\+|\\-)\\s?([0-9]+)\\s?(s|m|h)\\w*)?");
 	private static final Pattern sunpatterns=Pattern.compile("(official |nautical |nautic |astro |astronomical |civil )?(sunset|sunrise)");
 	//private static final DateFormat hhmmss=new SimpleDateFormat("HH:mm:ss");
+	private static final Pattern randomizepatterns=Pattern.compile("randomize (?:by )?([0-9]+)\\s?(m\\w*|s\\w*|h\\w*)?");
 
 	/* Overridable for unit testing only */
 	protected Time getTimeInstance()
@@ -106,6 +108,34 @@ public class NattyTimer extends LogicTimer
 		}
 		else
 			usedtimespec=timespec;
+		if(needToCheckRandomizePattern)
+		{
+			needToCheckRandomizePattern=false;
+			Matcher m=randomizepatterns.matcher(usedtimespec);
+			if(m.find())
+			{
+				needToCheckRandomizePattern=true;
+				StringBuffer newtimespec=new StringBuffer();
+				randomizeAmount=Integer.parseInt(m.group(1));
+				String type=m.group(2);
+				if(type!=null) switch(type.charAt(0))
+				{
+					case 's':
+						break;
+					case 'h':
+						randomizeAmount*=3600;
+						break;
+					case 'm':
+						randomizeAmount*=60;
+						break;
+				}
+				else
+					randomizeAmount*=60;
+				m.appendReplacement(newtimespec, "");
+				m.appendTail(newtimespec);
+				usedtimespec=newtimespec.toString();
+			}
+		}
 
 		Parser p=new Parser();
 		List<DateGroup> groups=p.parse(usedtimespec);
@@ -155,6 +185,11 @@ public class NattyTimer extends LogicTimer
 		}
 
 		Date nextrun=dates.get(dateIndex++);
+		if(randomizeAmount>0)
+		{
+			nextrun=new Date(nextrun.getTime() + Main.r.nextInt(randomizeAmount)*1000);
+		}
+
 		if(mustBeLaterThan.after(nextrun))
 		{
 			// Reschedule on next day
@@ -194,6 +229,11 @@ public class NattyTimer extends LogicTimer
 				msg.append("-");
 				msg.append(recursUntil);
 			}
+		}
+		if(randomizeAmount>0)
+		{
+			msg.append(":R");
+			msg.append(randomizeAmount);
 		}
 		msg.append("]");
 		return msg.toString();

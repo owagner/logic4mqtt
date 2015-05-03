@@ -147,6 +147,7 @@ public class ScriptScanner
 				ScriptContext cx=ls.scriptEngine.getContext();
 				cx.setWriter(new LogWriter(Level.INFO,logPrefix));
 				cx.setErrorWriter(new LogWriter(Level.WARNING,logPrefix));
+				cx.setAttribute(ScriptEngine.FILENAME,ls.f.getName(),ScriptContext.ENGINE_SCOPE);
 				ls.scriptEngine.eval(new FileReader(ls.f));
 			}
 			catch(FileNotFoundException e)

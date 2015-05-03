@@ -15,6 +15,8 @@ public class Main
 {
 	static final Timer t=new Timer(true);
 
+	static public Random r=new Random();
+
 	public static String getVersion()
 	{
 		// First, try the manifest tag
