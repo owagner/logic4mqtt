@@ -146,6 +146,9 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.19 - 2015/05/13 - owagner
+  - API: fix isDaylight(...) checks for the case that the end of a twilight is past midnight
+
 * 0.18 - 2015/05/03 - owagner
   - support randomization in  Natty timers with a "randomize by <amount> seconds/minutes/hours"
     construct. The "by" keyword and the unit specification are optional; if no unit is

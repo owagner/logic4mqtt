@@ -228,8 +228,19 @@ public class Time
 
 	public boolean isDaylight(String horizon)
 	{
-		return isBetween(getSunrise(horizon),getSunset(horizon));
+		return checkDaylight(getSunrise(horizon),getSunset(horizon));
 	}
+
+	private boolean checkDaylight(String timespec1,String timespec2)
+	{
+		Calendar cal_start=parseTimeSpec(timespec1);
+		Calendar cal_end=parseTimeSpec(timespec2);
+		Calendar now=getNow();
+		if(cal_start.after(cal_end))
+			return cal_end.before(now) && cal_start.after(now);
+		return cal_start.before(now) && cal_end.after(now);
+	}
+
 
 	/**
 	 * Shortcut to isDaylight() for full daylight
