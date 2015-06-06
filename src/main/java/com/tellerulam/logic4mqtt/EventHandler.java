@@ -49,7 +49,8 @@ public class EventHandler
 		boolean changeOnly,
 		EventCallbackInterface callback,
 		boolean oneShot,
-		String expires
+		String expires,
+		boolean initial
 	)
 	{
 		// Replace any possible destvalue with a Number instance, if possible
@@ -71,6 +72,8 @@ public class EventHandler
 				LogicTimer.addTimer("_EVENT_EXPIRER_"+topicPattern,expires,new AutoExpirer(handler),null);
 			if(L.isLoggable(Level.INFO))
 				L.info("Created new Event handler "+handler);
+			if(initial)
+				handler.checkInitialExecution(topicPattern);
 			return handler.id;
 		}
 	}
@@ -80,6 +83,18 @@ public class EventHandler
 		synchronized(handlers)
 		{
 			return new ArrayList<>(handlers.values());
+		}
+	}
+
+	private void checkInitialExecution(String topicPattern)
+	{
+		Map<String,Object> vals=TopicCache.getTopicValues(topicPattern);
+		for(Map.Entry<String,Object> val:vals.entrySet())
+		{
+			String topic=val.getKey();
+			Object value=val.getValue();
+			if(handles(topic) && hasDestValue(value))
+				queueExecution(topic,value,null,null);
 		}
 	}
 

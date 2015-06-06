@@ -96,6 +96,19 @@ public class TopicCache
 		return null;
 	}
 
+	public static Map<String, Object> getTopicValues(String topicPattern)
+	{
+		Map<String,Object> values=new HashMap<>();
+		Pattern p=Pattern.compile(convertStatusTopic(topicPattern));
+		synchronized(topics)
+		{
+			for(TopicCache t:topics.values())
+				if(p.matcher(t.topic).matches())
+					values.put(t.topic,t.values[0].value);
+		}
+		return values;
+	}
+
 	public Object getValue()
 	{
 		return changedValues[0].value;

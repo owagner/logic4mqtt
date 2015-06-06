@@ -146,6 +146,12 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.20 - 2015/06/06 - owagner
+  - API: added Events.getValues()
+  - API: support Events.setValue() and Events.storeValue() with arrays as values
+  - API: added "initial" parameter to Events.add() to force checking a callback once
+    with the initial value
+
 * 0.19 - 2015/05/13 - owagner
   - API: fix isDaylight(...) checks for the case that the end of a twilight is past midnight
 

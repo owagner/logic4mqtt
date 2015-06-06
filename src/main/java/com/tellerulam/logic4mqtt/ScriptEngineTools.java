@@ -121,4 +121,13 @@ public class ScriptEngineTools
 		JsonObject jso=mapToJSO(map);
 		return jso.toString();
 	}
+	static public String encodeAsJSON(Collection<?> values)
+	{
+		JsonArray arr=new JsonArray();
+		for(Object val:values)
+			arr.add(objectToJsonValue(val));
+		return arr.toString();
+	}
+
+
 }

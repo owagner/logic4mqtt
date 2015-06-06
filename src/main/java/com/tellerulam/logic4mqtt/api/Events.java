@@ -35,7 +35,7 @@ public class Events
 	public int onChangeTo(String topicPattern,Object value,EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, new Object[]{value}, true, callback, false, null);
+		return EventHandler.createNewHandler(topicPattern, new Object[]{value}, true, callback, false, null, false);
 	}
 	/**
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
@@ -49,7 +49,7 @@ public class Events
 	public int onChangeTo(String topicPattern,Object values[],EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, values, true, callback, false, null);
+		return EventHandler.createNewHandler(topicPattern, values, true, callback, false, null, false);
 	}
 	/**
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
@@ -62,7 +62,7 @@ public class Events
 	public int onChange(String topicPattern,EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, null, true, callback, false, null);
+		return EventHandler.createNewHandler(topicPattern, null, true, callback, false, null, false);
 	}
 	/**
 	 * Add an Event Handler on the specified topic pattern. It is triggered when the
@@ -75,7 +75,7 @@ public class Events
 	public int onUpdate(String topicPattern,EventCallbackInterface callback)
 	{
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		return EventHandler.createNewHandler(topicPattern, null, false, callback, false, null);
+		return EventHandler.createNewHandler(topicPattern, null, false, callback, false, null, false);
 	}
 
 	/**
@@ -87,6 +87,7 @@ public class Events
 	 *   values - value or array of values which trigger the event
 	 *   change - bool: whether to run only on changes of the value
 	 *   oneshot - bool: whether to remove the event handler after it run once
+	 *   initial - bool: whether to check calling the callback once with the initial value when added
 	 *
 	 * @return id of the new handler (to be used with e.g. remove)
 	 */
@@ -109,11 +110,12 @@ public class Events
 
 		boolean oneShot=ScriptEngineTools.interpretAsBoolean(params.get("oneshot"));
 		boolean change=ScriptEngineTools.interpretAsBoolean(params.get("change"));
+		boolean initial=ScriptEngineTools.interpretAsBoolean(params.get("initial"));
 
 		String expires=(String)params.get("expires");
 
 		topicPattern=TopicCache.convertStatusTopic(topicPattern);
-		int eid=EventHandler.createNewHandler(topicPattern, vals, change, callback, oneShot, expires);
+		int eid=EventHandler.createNewHandler(topicPattern, vals, change, callback, oneShot, expires, initial);
 
 		return eid;
 	}
@@ -148,6 +150,12 @@ public class Events
 		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(value), false);
 	}
 
+	public void setValue(String topic,Collection<?> values)
+	{
+		topic=TopicCache.convertSetTopic(topic);
+		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(values), false);
+	}
+
 	/**
 	 * Publish an update to the specified topic with the given value. It will be retained.
 	 *
@@ -164,6 +172,12 @@ public class Events
 	{
 		topic=TopicCache.convertSetTopic(topic);
 		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(value), true);
+	}
+
+	public void storeValue(String topic,Collection<?> values)
+	{
+		topic=TopicCache.convertSetTopic(topic);
+		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(values), true);
 	}
 
 	private static class QueuedSet implements TimerCallbackInterface
@@ -267,6 +281,37 @@ public class Events
 		if(tv!=null)
 			return tv.value;
 		return null;
+	}
+
+	public static class TopicEntry
+	{
+		TopicEntry(String topic, Object value)
+		{
+			this.topic=topic;
+			this.value=value;
+		}
+		public final String topic;
+		public final Object value;
+	}
+
+	/**
+	 *
+	 * Get the cached values of all topics matching "topicPattern"
+	 *
+	 * @param topicPattern
+	 * @return a map of matching topics to values
+	 */
+	public TopicEntry[] getValues(String topicPattern)
+	{
+		Map<String,Object> values=TopicCache.getTopicValues(topicPattern);
+		TopicEntry le[]=new TopicEntry[values.size()];
+		int lex=0;
+		for(Map.Entry<String,Object> me:values.entrySet())
+		{
+			TopicEntry te=new TopicEntry(me.getKey(),me.getValue());
+			le[lex++]=te;
+		}
+		return le;
 	}
 
 	/**
