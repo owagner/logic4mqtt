@@ -28,8 +28,8 @@ public class Events
 	 * topic changes to the specified value.
 	 *
 	 * @param topicPattern a RegEx matching topics
-	 * @param value
-	 * @param callback
+	 * @param value value which will trigger the callback
+	 * @param callback function to call
 	 * @return id of the new handler (to be used with e.g. remove)
 	 */
 	public int onChangeTo(String topicPattern,Object value,EventCallbackInterface callback)
@@ -42,8 +42,8 @@ public class Events
 	 * topic changes to any of the the specified values.
 	 *
 	 * @param topicPattern a RegEx matching topics
-	 * @param values
-	 * @param callback
+	 * @param values values which will trigger the callback
+	 * @param callback function to call
 	 * @return id of the new handler (to be used with e.g. remove)
 	 */
 	public int onChangeTo(String topicPattern,Object values[],EventCallbackInterface callback)
@@ -56,7 +56,7 @@ public class Events
 	 * topic changes from the previous value.
 	 *
 	 * @param topicPattern a RegEx matching topics
-	 * @param callback
+	 * @param callback function to call
 	 * @return id of the new handler (to be used with e.g. remove)
 	 */
 	public int onChange(String topicPattern,EventCallbackInterface callback)
@@ -69,7 +69,7 @@ public class Events
 	 * topic is being published to, regardless of the value.
 	 *
 	 * @param topicPattern a RegEx matching topics
-	 * @param callback
+	 * @param callback function to call
 	 * @return id of the new handler (to be used with e.g. remove)
 	 */
 	public int onUpdate(String topicPattern,EventCallbackInterface callback)
@@ -81,14 +81,14 @@ public class Events
 	/**
 	 * Add an Event Handler using a description object (e.g. JSON object from Javascript)
 	 *
-	 * @param topicPattern
-	 * @param callback
-	 * @param params Map with parameters:
-	 *   values - value or array of values which trigger the event
-	 *   change - bool: whether to run only on changes of the value
-	 *   oneshot - bool: whether to remove the event handler after it run once
-	 *   initial - bool: whether to check calling the callback once with the initial value when added
-	 *
+	 * @param topicPattern a RegEx matching topics
+	 * @param callback function to call
+	 * @param params Map with parameters:<ul>
+	 *   <li>values - value or array of values which trigger the event
+	 *   <li>change - bool: whether to run only on changes of the value
+	 *   <li>oneshot - bool: whether to remove the event handler after it run once
+	 *   <li>initial - bool: whether to check calling the callback once with the initial value when added
+	 *  </ul>
 	 * @return id of the new handler (to be used with e.g. remove)
 	 */
 	@SuppressWarnings("unchecked")
@@ -123,7 +123,7 @@ public class Events
 	/**
 	 * Removes an event handler which was added with one of the on...() methods.
 	 *
-	 * @param id
+	 * @param id of the handler to remove
 	 * @return boolean whether an event handler with the given id was found and removed
 	 */
 	public boolean remove(int id)
@@ -135,8 +135,8 @@ public class Events
 	 *
 	 * Publish an update to the specified topic with the given value. It will not be retained.
 	 *
-	 * @param topic
-	 * @param value
+	 * @param topic to publish on
+	 * @param value to publish
 	 */
 	public void setValue(String topic,Object value)
 	{
@@ -159,8 +159,8 @@ public class Events
 	/**
 	 * Publish an update to the specified topic with the given value. It will be retained.
 	 *
-	 * @param topic
-	 * @param value
+	 * @param topic to publish to
+	 * @param value to publish
 	 */
 	public void storeValue(String topic,Object value)
 	{
@@ -283,9 +283,12 @@ public class Events
 		return null;
 	}
 
-	public static class TopicEntry
+	/**
+	 * An array of instances of his helper class is returned by {@link Events#getValues(String)}
+	 */
+	static public class GetValuesEntry
 	{
-		TopicEntry(String topic, Object value)
+		GetValuesEntry(String topic, Object value)
 		{
 			this.topic=topic;
 			this.value=value;
@@ -299,16 +302,16 @@ public class Events
 	 * Get the cached values of all topics matching "topicPattern"
 	 *
 	 * @param topicPattern
-	 * @return a map of matching topics to values
+	 * @return an array of objects with members "topic" and "value"
 	 */
-	public TopicEntry[] getValues(String topicPattern)
+	public GetValuesEntry[] getValues(String topicPattern)
 	{
 		Map<String,Object> values=TopicCache.getTopicValues(topicPattern);
-		TopicEntry le[]=new TopicEntry[values.size()];
+		GetValuesEntry le[]=new GetValuesEntry[values.size()];
 		int lex=0;
 		for(Map.Entry<String,Object> me:values.entrySet())
 		{
-			TopicEntry te=new TopicEntry(me.getKey(),me.getValue());
+			GetValuesEntry te=new GetValuesEntry(me.getKey(),me.getValue());
 			le[lex++]=te;
 		}
 		return le;

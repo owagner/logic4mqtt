@@ -6,6 +6,7 @@
  * you can call the method addTimer in class Timers simply by calling
  * <pre>
  * {@code Timers.addTimer("Test","every sunset",function(){
+ *    ...
  *   });}
  * </pre>
  */
