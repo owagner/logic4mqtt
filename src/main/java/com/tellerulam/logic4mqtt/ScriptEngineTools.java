@@ -128,6 +128,13 @@ public class ScriptEngineTools
 			arr.add(objectToJsonValue(val));
 		return arr.toString();
 	}
+	static public String encodeAsJSON(Object values[])
+	{
+		JsonArray arr=new JsonArray();
+		for(Object val:values)
+			arr.add(objectToJsonValue(val));
+		return arr.toString();
+	}
 
 
 }

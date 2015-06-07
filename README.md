@@ -146,6 +146,10 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.21 - 2015/06/07 - owagner
+  - API: actually changed Events.setValue() and storeValue() array signatures to accept Object[] instead
+    of Collection<?>, as the latter caused ambiguity with passing plain objects
+
 * 0.20 - 2015/06/06 - owagner
   - API: added Events.getValues()
   - API: support Events.setValue() and Events.storeValue() with arrays as values

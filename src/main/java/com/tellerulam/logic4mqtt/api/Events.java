@@ -150,7 +150,7 @@ public class Events
 		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(value), false);
 	}
 
-	public void setValue(String topic,Collection<?> values)
+	public void setValue(String topic,Object values[])
 	{
 		topic=TopicCache.convertSetTopic(topic);
 		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(values), false);
