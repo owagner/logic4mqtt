@@ -147,7 +147,8 @@ minutes are assumed. The "by" keyword is entirely optional.
 Changelog
 ---------
 * 0.23 - 2015/06/14 - owagner
-  - no longer support Java 7 (EOLed anyway, and maintaining Rhino compatibility is tricky)  
+  - no longer support Java 7 (EOLed anyway, and maintaining Rhino compatibility is tricky)
+  - API: added support for sending E-Mails via the "Mail" utility object. Uses Java Mail.  
 
 * 0.22 - 2015/06/14 - owagner
   - API: more shuffling with method signatures for setValue() and JSON encoding code to work properly with 

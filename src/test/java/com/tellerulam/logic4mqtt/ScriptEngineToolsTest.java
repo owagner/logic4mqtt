@@ -6,8 +6,6 @@ import java.util.*;
 
 import javax.script.*;
 
-import jdk.nashorn.api.scripting.*;
-
 import org.junit.*;
 
 public class ScriptEngineToolsTest
