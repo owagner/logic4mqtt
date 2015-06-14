@@ -37,23 +37,10 @@ public class ScriptEngineTools
 		}
 	}
 
-	private static JsonValue objectToJsonValue(Object v)
-	{
-		if(v==null)
-			return JsonValue.NULL;
-		if(v instanceof Integer)
-			return JsonValue.valueOf(((Integer)v).intValue());
-		else if(v instanceof Number)
-			return JsonValue.valueOf(((Number)v).doubleValue());
-		else if(v instanceof Boolean)
-			return ((Boolean)v).booleanValue()?JsonValue.TRUE:JsonValue.FALSE;
-		else
-			return JsonValue.valueOf(v.toString());
-	}
 	/*
 	 * Special hack for Nashorn: Unlike Rhino, passed Javascript arrays will not be wrapped
 	 * in an object wrapped with a List implementation. We therefore do some reflection
-	 * magic to call isArra() and values() on the ScriptObjectMirror
+	 * magic to call isArray() and values() on the ScriptObjectMirror
 	 */
 	private static Class<?> scriptObjectMirrorClass;
 	private static Method scriptObjectMirrorClass_isArray,scriptObjectMirrorClass_values;
@@ -66,7 +53,7 @@ public class ScriptEngineTools
 		}
 		catch(ClassNotFoundException | NoSuchMethodException | SecurityException e)
 		{
-			/* Ignore, we're probably not running Nashorn */
+			/* Ignore, we're probably simply not running Nashorn */
 			scriptObjectMirrorClass=null;
 		}
 	}
@@ -116,24 +103,67 @@ public class ScriptEngineTools
 		return jso;
 	}
 
-	static public String encodeAsJSON(Map<String,Object> map)
+	@SuppressWarnings("unchecked")
+	private static JsonValue objectToJsonValue(Object v)
 	{
-		JsonObject jso=mapToJSO(map);
+		if(scriptObjectMirrorClass!=null && (v instanceof Bindings))
+		{
+			// Check whether we this is a Nashorn Array
+			// and convert it into a Java array, then
+			if(scriptObjectMirrorClass.isAssignableFrom(v.getClass()))
+			{
+				try
+				{
+					if(scriptObjectMirrorClass_isArray.invoke(v).equals(Boolean.TRUE))
+						v=scriptObjectMirrorClass_values.invoke(v);
+				}
+				catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+				{
+					/* Conversion failed, continue as normal */
+				}
+			}
+		}
+
+		if(v==null)
+			return JsonValue.NULL;
+		if(v instanceof Integer)
+			return JsonValue.valueOf(((Integer)v).intValue());
+		else if(v instanceof Number)
+			return JsonValue.valueOf(((Number)v).doubleValue());
+		else if(v instanceof Boolean)
+			return ((Boolean)v).booleanValue()?JsonValue.TRUE:JsonValue.FALSE;
+		else if(v instanceof Map) // Will also cover Bindings
+		{
+			JsonObject jso=new JsonObject();
+			for(Map.Entry<String,? extends Object> me:((Map<String,? extends Object>)v).entrySet())
+			{
+				jso.add(me.getKey(),objectToJsonValue(me.getValue()));
+			}
+			return jso;
+		}
+		else if(v instanceof Collection<?>)
+		{
+			JsonArray jsa=new JsonArray();
+			Iterator<?> i=((Collection<?>)v).iterator();
+			while(i.hasNext())
+				jsa.add(objectToJsonValue(i.next()));
+			return jsa;
+		}
+		else if(v instanceof Object[])
+		{
+			Object vo[]=(Object[])v;
+			JsonArray jsa=new JsonArray();
+			for(Object o:vo)
+				jsa.add(objectToJsonValue(o));
+			return jsa;
+		}
+		else
+			return JsonValue.valueOf(v.toString());
+	}
+	static public String encodeAsJSON(Object v)
+	{
+		JsonValue jso=objectToJsonValue(v);
 		return jso.toString();
-	}
-	static public String encodeAsJSON(Collection<?> values)
-	{
-		JsonArray arr=new JsonArray();
-		for(Object val:values)
-			arr.add(objectToJsonValue(val));
-		return arr.toString();
-	}
-	static public String encodeAsJSON(Object values[])
-	{
-		JsonArray arr=new JsonArray();
-		for(Object val:values)
-			arr.add(objectToJsonValue(val));
-		return arr.toString();
 	}
 
 

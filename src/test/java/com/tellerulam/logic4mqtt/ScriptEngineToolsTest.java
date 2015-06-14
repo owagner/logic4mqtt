@@ -26,7 +26,17 @@ public class ScriptEngineToolsTest
 			if(d == (long) d)
 		        return String.format("%d",(long)d);
 		    else
-		        return String.format("%s",d);		}
+		        return String.format("%s",d);
+		}
+		public String lastStore;
+		public void storeJSON(Map<String,Object> val)
+		{
+			lastStore=ScriptEngineTools.encodeAsJSON(val);
+		}
+		/*public void storeJSON(Object val[])
+		{
+			lastStore=ScriptEngineTools.encodeAsJSON(val);
+		}*/
 	}
 
 	@Test
@@ -45,5 +55,30 @@ public class ScriptEngineToolsTest
 
 		for(int ix=0;ix<testcases.length;ix+=2)
 			assertEquals(testcases[ix],se.eval("TestFix.dotest("+testcases[ix+1]+")"));
+	}
+
+	@Test
+	public void encodeJSONtest() throws ScriptException
+	{
+		ScriptEngineManager sem=new ScriptEngineManager();
+		ScriptEngine se=sem.getEngineByExtension("js");
+		TestReceiver tr=new TestReceiver();
+		se.put("TestFix",tr);
+		/* JS representation, JSON text */
+		String testcases[]={
+			"[[1,2],[3,4]]", "[[1,2],[3,4]]",
+			"[12,13]",	"[12,13]",
+			"{dummy:15}", "{\"dummy\":15}",
+			"{dummy:[15,16]}", "{\"dummy\":[15,16]}",
+			"{dummy:{a:2,b:3}}", "{\"dummy\":{\"a\":2,\"b\":3}}",
+			"{dummy:{a:2,b:[3,1,4]}}", "{\"dummy\":{\"a\":2,\"b\":[3,1,4]}}",
+			"[{o:1},{o:2}]", "[{\"o\":1},{\"o\":2}]",
+		};
+		for(int ix=0;ix<testcases.length;ix+=2)
+		{
+			se.eval("TestFix.storeJSON("+testcases[ix]+")");
+			System.out.println(testcases[ix]+" yields "+tr.lastStore);
+			assertEquals(testcases[ix+1],tr.lastStore);
+		}
 	}
 }

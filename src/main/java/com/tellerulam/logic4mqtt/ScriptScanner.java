@@ -122,6 +122,26 @@ public class ScriptScanner
 		}
 	}
 
+	static void executeJavascript(String suffix,String code)
+	{
+		try
+		{
+			ScriptEngine engine=getEngine(suffix);
+			String logPrefix="[cmdline]";
+			if("Rhino".equals(engine.getFactory().getEngineName()))
+				applyRhinoWrapHack();
+			ScriptContext cx=engine.getContext();
+			cx.setWriter(new LogWriter(Level.INFO,logPrefix));
+			cx.setErrorWriter(new LogWriter(Level.WARNING,logPrefix));
+			cx.setAttribute(ScriptEngine.FILENAME,"cmdline",ScriptContext.ENGINE_SCOPE);
+			engine.eval(code);
+		}
+		catch(ScriptException e)
+		{
+			L.log(Level.SEVERE, "Error executing code "+code,e);
+		}
+	}
+
 	static void doScan(String dirName)
 	{
 		// Gather scripts

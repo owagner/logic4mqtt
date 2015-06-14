@@ -146,6 +146,10 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.22 - 2015/06/14 - owagner
+  - API: more shuffling with method signatures for setValue() and JSON encoding code to work properly with 
+    both Rhino and Nashorn in case of nested arrays
+
 * 0.21 - 2015/06/07 - owagner
   - API: actually changed Events.setValue() and storeValue() array signatures to accept Object[] instead
     of Collection<?>, as the latter caused ambiguity with passing plain objects

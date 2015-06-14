@@ -150,11 +150,13 @@ public class Events
 		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(value), false);
 	}
 
+	/*
 	public void setValue(String topic,Object values[])
 	{
 		topic=TopicCache.convertSetTopic(topic);
 		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(values), false);
 	}
+	*/
 
 	/**
 	 * Publish an update to the specified topic with the given value. It will be retained.
