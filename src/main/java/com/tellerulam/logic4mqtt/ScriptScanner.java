@@ -44,6 +44,7 @@ public class ScriptScanner
 				se.put("Timers", InstanceManager.getTimersInstance());
 				se.put("Utilities", InstanceManager.getUtilitiesInstance());
 				se.put("Time", InstanceManager.getTimeInstance());
+				se.put("Mail", InstanceManager.getMailInstance());
 				engines.put(ext,se);
 			}
 		}

@@ -18,4 +18,8 @@ public class InstanceManager
 	{
 		return Utilities.instance;
 	}
+	public static Mail getMailInstance()
+	{
+		return Mail.instance;
+	}
 }

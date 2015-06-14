@@ -59,51 +59,6 @@ public class ScriptEngineTools
 	}
 
 	@SuppressWarnings("unchecked")
-	private static JsonObject mapToJSO(Map<String,Object> map)
-	{
-		JsonObject jso=new JsonObject();
-		for(Map.Entry<String,Object> me:map.entrySet())
-		{
-			Object v=me.getValue();
-			if(scriptObjectMirrorClass!=null && (v instanceof Bindings))
-			{
-				// Check whether we this is a Nashorn Array
-				if(scriptObjectMirrorClass.isAssignableFrom(v.getClass()))
-				{
-					try
-					{
-						if(scriptObjectMirrorClass_isArray.invoke(v).equals(Boolean.TRUE))
-							v=scriptObjectMirrorClass_values.invoke(v);
-					}
-					catch(IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
-					{
-						/* Conversion failed, continue as normal */
-					}
-				}
-			}
-			if(v instanceof Bindings)
-			{
-				jso.add(me.getKey(),mapToJSO((Bindings)me.getValue()));
-			}
-			else if(v instanceof Map)
-			{
-				jso.add(me.getKey(),mapToJSO((Map<String,Object>)me.getValue()));
-			}
-			else if(v instanceof Collection)
-			{
-				JsonArray arr=new JsonArray();
-				Collection<Object> col=(Collection<Object>)v;
-				for(Object colv:col)
-					arr.add(objectToJsonValue(colv));
-				jso.add(me.getKey(),arr);
-			}
-			else
-				jso.add(me.getKey(),objectToJsonValue(v));
-		}
-		return jso;
-	}
-
-	@SuppressWarnings("unchecked")
 	private static JsonValue objectToJsonValue(Object v)
 	{
 		if(scriptObjectMirrorClass!=null && (v instanceof Bindings))

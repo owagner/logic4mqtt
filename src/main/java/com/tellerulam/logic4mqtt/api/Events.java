@@ -176,7 +176,7 @@ public class Events
 		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(value), true);
 	}
 
-	public void storeValue(String topic,Collection<?> values)
+	public void storeValue(String topic,List<?> values)
 	{
 		topic=TopicCache.convertSetTopic(topic);
 		MQTTHandler.doPublish(topic, ScriptEngineTools.encodeAsJSON(values), true);

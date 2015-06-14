@@ -19,7 +19,7 @@ for languages like Groovy, Jython and others.
 
 Dependencies
 ------------
-* Java 1.7 (or higher) SE Runtime Environment: https://www.java.com/
+* Java 1.8 (or higher) SE Runtime Environment: https://www.java.com/
 * Eclipse Paho: https://www.eclipse.org/paho/clients/java/ (used for MQTT communication)
 * Minimal-JSON: https://github.com/ralfstx/minimal-json (used for JSON creation and parsing)
 * natty: http://natty.joestelmach.com/ (used for natural language time parsing)
@@ -146,6 +146,9 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.23 - 2015/06/14 - owagner
+  - no longer support Java 7 (EOLed anyway, and maintaining Rhino compatibility is tricky)  
+
 * 0.22 - 2015/06/14 - owagner
   - API: more shuffling with method signatures for setValue() and JSON encoding code to work properly with 
     both Rhino and Nashorn in case of nested arrays

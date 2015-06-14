@@ -6,6 +6,8 @@ import java.util.*;
 
 import javax.script.*;
 
+import jdk.nashorn.api.scripting.*;
+
 import org.junit.*;
 
 public class ScriptEngineToolsTest
@@ -33,10 +35,10 @@ public class ScriptEngineToolsTest
 		{
 			lastStore=ScriptEngineTools.encodeAsJSON(val);
 		}
-		/*public void storeJSON(Object val[])
+		public void storeJSON(List<?> val)
 		{
 			lastStore=ScriptEngineTools.encodeAsJSON(val);
-		}*/
+		}
 	}
 
 	@Test
