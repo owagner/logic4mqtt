@@ -103,21 +103,55 @@ public class MQTTHandler
 		}
 	}
 
+	static protected Object convertJsonToJavaObjectTree(JsonValue v)
+	{
+		if(v.isArray())
+		{
+			JsonArray a=(JsonArray)v;
+			ArrayList<Object> resArray=new ArrayList<>();
+			for(JsonValue av:a)
+				resArray.add(convertJsonToJavaObjectTree(av));
+			return resArray.toArray();
+		}
+		else if(v.isObject())
+		{
+			JsonObject o=(JsonObject)v;
+			Map<String,Object> resObj=new HashMap<>();
+			for(JsonObject.Member m:o)
+			{
+				resObj.put(m.getName(),convertJsonToJavaObjectTree(m.getValue()));
+			}
+			return resObj;
+		}
+		else if(v.isNumber())
+			return new Double(v.asDouble());
+		else if(v.isBoolean())
+			return v.asBoolean()?Boolean.TRUE:Boolean.FALSE;
+		else if(v.isString())
+			return v.asString();
+		else if(v.isNull())
+			return null;
+		else // Fallback
+			return v.toString();
+	}
+
 	void processMessage(String topic,MqttMessage msg)
 	{
 		L.fine("Received "+msg+" to "+topic);
 
 		// Determine whether the payload is JSON encoded or not
 		String payload=new String(msg.getPayload(),StandardCharsets.UTF_8);
-		Object transformedVal;
+		String trimmedPayload=payload.trim();
+		Object transformedVal,fullValue;
 
-		if(payload.trim().startsWith("{"))
+		if(trimmedPayload.startsWith("{"))
 		{
 			JsonObject data=JsonObject.readFrom(payload);
+			fullValue=convertJsonToJavaObjectTree(data);
 			JsonValue val=data.get("val");
 			if(val==null)
-				return;
-			if(val.isNumber())
+				transformedVal=fullValue;
+			else if(val.isNumber())
 				transformedVal=Double.valueOf(val.asDouble());
 			else if(val.isString())
 				transformedVal=val.asString();
@@ -128,10 +162,18 @@ public class MQTTHandler
 			else
 				transformedVal=val.toString();
 		}
+		else if(trimmedPayload.startsWith("["))
+		{
+			JsonArray data=JsonArray.readFrom(payload);
+			fullValue=transformedVal=convertJsonToJavaObjectTree(data);
+		}
 		else
+		{
 			transformedVal=convertStringToObject(payload);
+			fullValue=null;
+		}
 
-		TopicCache t=TopicCache.storeTopic(topic,transformedVal);
+		TopicCache t=TopicCache.storeTopic(topic,transformedVal,fullValue);
 		// If this is a retained message, do not dispatch an event
 		if(msg.isRetained())
 			return;

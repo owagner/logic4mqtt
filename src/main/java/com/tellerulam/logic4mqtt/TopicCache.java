@@ -70,7 +70,7 @@ public class TopicCache
 		return topic;
 	}
 
-	static TopicCache storeTopic(String topic,Object newValue)
+	static TopicCache storeTopic(String topic,Object newValue,Object fullValue)
 	{
 		synchronized(topics)
 		{
@@ -80,7 +80,7 @@ public class TopicCache
 				t=new TopicCache(topic);
 				topics.put(t.topic,t);
 			}
-			t.storeValue(newValue);
+			t.storeValue(newValue,fullValue);
 			return t;
 		}
 	}
@@ -113,6 +113,10 @@ public class TopicCache
 	{
 		return changedValues[0].value;
 	}
+	public Object getFullValue()
+	{
+		return changedValues[0].fullValue;
+	}
 	public Object getPreviousValue()
 	{
 		if(changedValues[1]!=null)
@@ -130,18 +134,18 @@ public class TopicCache
 	{
 		return lastStoreWasRefresh;
 	}
-	private void storeValue(Object newValue)
+	private void storeValue(Object newValue,Object fullValue)
 	{
 		System.arraycopy(values,0,values,1,values.length-1);
-		values[0]=new TopicValue(newValue,new Date());
-		if(changedValues[0]!=null && newValue.equals(changedValues[0].value))
+		values[0]=new TopicValue(newValue,new Date(),fullValue);
+		if(changedValues[0]!=null && (newValue==changedValues[0] || (newValue!=null && newValue.equals(changedValues[0].value))))
 		{
 			changedValues[0].markAsRefreshed();
 			lastStoreWasRefresh=true;
 			return;
 		}
 		System.arraycopy(changedValues,0,changedValues,1,changedValues.length-1);
-		changedValues[0]=new TopicValue(newValue,new Date());
+		changedValues[0]=new TopicValue(newValue,new Date(),fullValue);
 		lastStoreWasRefresh=false;
 	}
 
@@ -154,13 +158,14 @@ public class TopicCache
 
 	static public class TopicValue
 	{
-		private TopicValue(Object value, Date ts)
+		private TopicValue(Object value, Date ts,Object fullValue)
 		{
 			this.value=value;
 			this.ts=ts;
 			this.lastRefresh=ts;
+			this.fullValue=fullValue;
 		}
-		public final Object value;
+		public final Object value,fullValue;
 		public final Date ts;
 		public Date lastRefresh;
 		void markAsRefreshed()

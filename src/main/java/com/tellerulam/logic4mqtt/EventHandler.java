@@ -94,13 +94,14 @@ public class EventHandler
 			String topic=val.getKey();
 			Object value=val.getValue();
 			if(handles(topic) && hasDestValue(value))
-				queueExecution(topic,value,null,null);
+				queueExecution(topic,value,null,null,null);
 		}
 	}
 
 	static void dispatchEvent(String topic,TopicCache t)
 	{
 		Object value=t.getValue();
+		Object fullValue=t.getFullValue();
 		synchronized(handlers)
 		{
 			for(EventHandler h:handlers.values())
@@ -108,7 +109,7 @@ public class EventHandler
 				if(h.handles(topic) && h.hasDestValue(value))
 				{
 					if(!h.changeOnly || !t.wasRefreshed())
-						h.queueExecution(topic, value, t.getPreviousValue(), t.getPreviousTimestamp());
+						h.queueExecution(topic, value, t.getPreviousValue(), t.getPreviousTimestamp(), fullValue);
 				}
 			}
 		}
@@ -148,10 +149,10 @@ public class EventHandler
 		return m.matches();
 	}
 
-	private void queueExecution(String topic,Object value,Object previousValue,Date previousTimestamp)
+	private void queueExecution(String topic,Object value,Object previousValue,Date previousTimestamp,Object fullValue)
 	{
 		topic=TopicCache.removeStatusFunction(topic);
-		eventExecutor.execute(new EventRunner(topic,value,previousValue,previousTimestamp));
+		eventExecutor.execute(new EventRunner(topic,value,previousValue,previousTimestamp,fullValue));
 	}
 
 	private class EventRunner implements Runnable
@@ -159,20 +160,23 @@ public class EventHandler
 		final String topic;
 		final Object value;
 		final Object previousValue;
+		final Object fullValue;
 		final Date previousTimestamp;
-		EventRunner(String topic, Object value, Object previousValue, Date previousTimestamp)
+		EventRunner(String topic, Object value, Object previousValue, Date previousTimestamp,Object fullValue)
 		{
 			this.topic=topic;
 			this.value=value;
 			this.previousValue=previousValue;
 			this.previousTimestamp=previousTimestamp;
+			this.fullValue=fullValue;
 		}
 		@Override
 		public void run()
 		{
+			//L.log(Level.SEVERE,"Value "+value+" is class "+value.getClass());
 			try
 			{
-				callback.run(topic,value,previousValue,previousTimestamp);
+				callback.run(topic,value,previousValue,previousTimestamp,fullValue);
 			}
 			catch(Exception e)
 			{

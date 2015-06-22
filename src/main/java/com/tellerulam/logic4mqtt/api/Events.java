@@ -1,5 +1,32 @@
-/*
- * This object contains the interface from scripts to the Event handling system
+/**
+ * This object contains the interface from scripts to the Event handling system.
+ *
+ * Event callbacks receive the following arguments:
+ *
+ * 	public void run(String topic,Object newValue,Object previousValue,Date previousTimestamp,Object fullValue);
+ *  <ul>
+ *   <li>topic - the topic on which the event occured (with the function replaced by "//")
+ *   <li>newValue - the new simple value of the topic (the "val" field in case of a received JSON encoded message)
+ *   <li>previousValue - the previous simple value of the topic
+ *   <li>previousTimestamp - the time when the previous value was set
+ *   <li>fullValue - the complete MQTT message as received and JSON-parsed, with all meta data
+ *  </ul>
+ *
+ *
+ * <b>Type conversion</b>: If you use the Nashorn (Javascript) engine and the simple value of a topic is
+ * an array, you must manually convert the received object into a Javascript array using the Java.from()
+ * Nashorn special method. On the other hand, it is <u>not</u> necessary to do this when passing
+ * Javascript arrays to the Java utility functions.<b>
+ *
+ * Example:
+ *
+ *   var testArray=["Hello","World"];
+ *   Events.setValue("$TEST",testArray);
+ *   var res=Events.getValue("$TEST");
+ *   // res now holds an Object, not an Array. Let's convert it:
+ *   var resArray=Java.from(res);
+ *   // resArray is now an array
+ *
  */
 
 package com.tellerulam.logic4mqtt.api;
@@ -284,6 +311,24 @@ public class Events
 			return tv.value;
 		return null;
 	}
+
+	/*
+	public Collection<?> getValueAsArray(String topic,int generation)
+	{
+		topic=TopicCache.convertStatusTopic(topic);
+		TopicValue tv=TopicCache.getTopicValue(topic, generation);
+		if(tv!=null)
+		{
+			if(tv.value instanceof List<?>)
+				return ((List<?>)tv.value);
+			else if(tv.value instanceof Map<?,?>)
+				return ((Map<?,?>)tv.value).values();
+			else
+				return Collections.singleton(tv.value);
+
+		}
+		return null;
+	}*/
 
 	/**
 	 * An array of instances of his helper class is returned by {@link Events#getValues(String)}

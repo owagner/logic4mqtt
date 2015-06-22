@@ -146,6 +146,12 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.24 - 2015/06/22 - owagner
+  - API: extended callback signatures to receive the full JSON encoded object from MQTT as a fifth parameter,
+    including all meta-fields
+  - API: make event handling deal with messages which are a JSON array or an JSON object without "val" field.
+    In this case, the simple value will be the complete object as well, similar to the "full value".
+
 * 0.23 - 2015/06/14 - owagner
   - no longer support Java 7 (EOLed anyway, and maintaining Rhino compatibility is tricky)
   - API: added support for sending E-Mails via the "Mail" utility object. Uses Java Mail.  

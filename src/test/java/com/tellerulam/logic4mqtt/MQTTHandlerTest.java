@@ -2,7 +2,11 @@ package com.tellerulam.logic4mqtt;
 
 import static org.junit.Assert.*;
 
+import java.util.Collection;
+
 import org.junit.*;
+
+import com.eclipsesource.json.JsonArray;
 
 public class MQTTHandlerTest
 {
@@ -19,6 +23,17 @@ public class MQTTHandlerTest
 
 		for(int ix=0;ix<testset.length;ix+=2)
 			assertEquals(testset[ix].toString(),MQTTHandler.convertValue(testset[ix+1]));
+	}
+
+
+	@Test
+	public void testArray()
+	{
+		JsonArray a=JsonArray.readFrom("[1]");
+		Object o=MQTTHandler.convertJsonToJavaObjectTree(a);
+		System.out.println(o);
+		System.out.println(o.getClass());
+		assert(o instanceof Collection);
 	}
 
 }
