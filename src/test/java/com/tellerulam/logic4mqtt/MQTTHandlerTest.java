@@ -2,8 +2,6 @@ package com.tellerulam.logic4mqtt;
 
 import static org.junit.Assert.*;
 
-import java.util.Collection;
-
 import org.junit.*;
 
 import com.eclipsesource.json.JsonArray;
@@ -33,7 +31,7 @@ public class MQTTHandlerTest
 		Object o=MQTTHandler.convertJsonToJavaObjectTree(a);
 		System.out.println(o);
 		System.out.println(o.getClass());
-		assert(o instanceof Collection);
+		assert(o.getClass().isArray());
 	}
 
 }
