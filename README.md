@@ -151,6 +151,8 @@ Changelog
     including all meta-fields
   - API: make event handling deal with messages which are a JSON array or an JSON object without "val" field.
     In this case, the simple value will be the complete object as well, similar to the "full value".
+  - API: added "priority" to mail properties
+  - API: added Timers.rateLimit()
 
 * 0.23 - 2015/06/14 - owagner
   - no longer support Java 7 (EOLed anyway, and maintaining Rhino compatibility is tricky)

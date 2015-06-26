@@ -29,5 +29,28 @@ public class Timers
 		return LogicTimer.remTimer(symbolicName);
 	}
 
+	/**
+	 * Utility method to rate-limit execution. Called with a symbolic name and a minimum interval,
+	 * will return a boolean whether to execute now or not.
+	 *
+	 * Example: React to a PIR movement detection, but only sent email once every 300 seconds
+	 *
+	 * Events.onUpdate("device//pir/MOTION",function(topic,val){
+	 * 	if(Timers.rateLimit("PIR_REPORT",300))
+	 *  {
+	 *    Mail.sendMail("ALARM!","Movement detected");
+	 *  }
+	 * });
+	 *
+	 *
+	 * @param symbolicName
+	 * @param intervalInSeconds
+	 * @return whether to execute now
+	 */
+	public boolean rateLimit(String symbolicName,int intervalInSeconds)
+	{
+		return RateLimiter.rateLimit(symbolicName,intervalInSeconds);
+	}
+
 	//private static Logger L=Logger.getLogger(Timers.class.getName());
 }

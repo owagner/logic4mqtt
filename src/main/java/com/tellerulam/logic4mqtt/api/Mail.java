@@ -26,6 +26,7 @@ import com.tellerulam.logic4mqtt.*;
  * <li>host - SMTP relay host (defaults to localhost)
  * <li>user - SMTP server login
  * <li>password - SMTP server password
+ * <li>priority - X-Priority value (1..5) (highest to lowest)
  * </ul>
  *
  * Additionally, all of the standard Java Mail API properties are supported:
@@ -110,6 +111,10 @@ public class Mail
 				String to=params.getProperty("to");
 			    msg.setRecipients(Message.RecipientType.TO,InternetAddress.parse(to, false));
 			    msg.setSubject(subject);
+
+			    String pri=params.getProperty("priority");
+			    if(pri!=null)
+			    	msg.addHeader("X-Priority",pri);
 
 			    if(attachments!=null)
 			    {
