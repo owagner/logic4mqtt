@@ -146,6 +146,10 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.25 - 2015/07/19 - owagner
+  - updated to eclipse-paho 1.0.2
+  - ignore intermediate syslog errors
+
 * 0.24 - 2015/06/22 - owagner
   - API: extended callback signatures to receive the full JSON encoded object from MQTT as a fifth parameter,
     including all meta-fields
