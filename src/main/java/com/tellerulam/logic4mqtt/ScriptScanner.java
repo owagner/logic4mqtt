@@ -175,7 +175,7 @@ public class ScriptScanner
 			{
 				L.log(Level.SEVERE, "Script "+ls.f+" no longer found?!?",e);
 			}
-			catch(ScriptException e)
+			catch(Exception e)
 			{
 				L.log(Level.SEVERE, "Error executing script "+ls.f,e);
 				System.exit(1);

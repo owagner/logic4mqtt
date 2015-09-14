@@ -97,16 +97,17 @@ public class Utilities
 	 *
 	 * Note: The complete script engine will block while waiting timeoutMillis. It is
 	 * recommended to keep the value as low as possible. Do not set it to a value
-	 * higher than zero unless you really need the response.
+	 * higher than zero unless you really, really need the response.
 	 *
 	 * @param host the host to send the message to. Either an IP address or a hostname.
 	 * @param port the port number (1-65535)
 	 * @param message the payload of the message
 	 * @param udp if true, UDP will be used, TCP otherwise
 	 * @param timeoutMillis amount of time to wait for a response. If 0, we don't wait
+	 * @param encoding The character encoding to use when converting the string (e.g. "UTF-8")
 	 * @return the received response, or null if anything went wrong or a timeout occured
 	 */
-	public String sendNetMessage(String host,int port,String message,boolean udp,int timeoutMillis)
+	public String sendNetMessage(String host,int port,String message,boolean udp,int timeoutMillis,String encoding)
 	{
 		String response=null;
 		try
@@ -114,7 +115,7 @@ public class Utilities
 			if(udp)
 			{
 				DatagramSocket s=new DatagramSocket();
-				byte payload[]=message.getBytes(StandardCharsets.UTF_8);
+				byte payload[]=message.getBytes(encoding);
 				DatagramPacket p=new DatagramPacket(payload,payload.length);
 				s.connect(InetAddress.getByName(host), port);
 				s.send(p);
@@ -148,6 +149,7 @@ public class Utilities
 
 	/**
 	 * Send a simple, raw network message via TCP or UDP to a given host and port.
+	 * The message will be encoded as UTF-8 bytes.
 	 *
 	 * This is intended for simple automation protocols. If you need more flexibility,
 	 * look into the libraries of your scripting language.
@@ -159,11 +161,12 @@ public class Utilities
 	 */
 	public void sendNetMessage(String host,int port,String message,boolean udp)
 	{
-		sendNetMessage(host,port,message,udp,0);
+		sendNetMessage(host,port,message,udp,0,"UTF-8");
 	}
 
 	/**
 	 * Send a simple, raw network message via TCP to a given host and port.
+	 * The message will be encoded as UTF-8 bytes.
 	 *
 	 * This is intended for simple automation protocols. If you need more flexibility,
 	 * look into the libraries of your scripting language.
@@ -174,7 +177,7 @@ public class Utilities
 	 */
 	public void sendNetMessage(String host,int port,String message)
 	{
-		sendNetMessage(host,port,message,false,0);
+		sendNetMessage(host,port,message,false,0,"UTF-8");
 	}
 
 	/**

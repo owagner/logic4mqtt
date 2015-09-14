@@ -146,6 +146,12 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.26 - 2015/09/15 - owagner
+  - API: Utilities.sendNetMessage() now accepts an optional encoding parameter
+  - exit on any exception when executing a script during startup, not only on ScriptException.
+    Previously, normal API-level exceptions (like IllegalArgumentException) could be thrown
+    and would be logged, but ignored, thus hiding script bugs
+
 * 0.25 - 2015/07/19 - owagner
   - updated to eclipse-paho 1.0.2
   - ignore intermediate syslog errors
