@@ -115,6 +115,7 @@ public class Events
 	 *   <li>change - bool: whether to run only on changes of the value
 	 *   <li>oneshot - bool: whether to remove the event handler after it run once
 	 *   <li>initial - bool: whether to check calling the callback once with the initial value when added
+	 *   <li>expires - string: timespec when handler expires
 	 *  </ul>
 	 * @return id of the new handler (to be used with e.g. remove)
 	 */
@@ -411,4 +412,65 @@ public class Events
 		topic=TopicCache.convertGetTopic(topic);
 		MQTTHandler.doPublish(topic, "?", false);
 	}
+
+	public int test(String srcTopic,String destTopic,Map<String,Object> params)
+	{
+		Object v=params.get("mapper");
+		System.out.println(v);
+		System.out.println(v.getClass());
+		return 0;
+	}
+	/**
+	 *
+	 * Link one topic to another. Only the "val" part of the source topic will be set
+	 * on the destination topic.
+	 *
+	 * @param srcTopic Source topic
+	 * @param destTopic Destination topic
+	 * @param params Map with parameters:<ul>
+	 *   <li>change - bool: whether to link only on changes of the source value
+	 *   <li>oneshot - bool: whether to remove the event handler after it run once
+	 *   <li>initial - bool: whether to link once with the initial value when added
+	 *   <li>retain - bool: whether the setting occurs with the retain flag set
+	 * @return id of the new handler (to be used with e.g. remove)
+	 */
+	public int linkValue(String srcTopic,String destTopic,Map<String,Object> params)
+	{
+		final boolean oneShot=ScriptEngineTools.interpretAsBoolean(params.get("oneshot"));
+		final boolean change=ScriptEngineTools.interpretAsBoolean(params.get("change"));
+		final boolean initial=ScriptEngineTools.interpretAsBoolean(params.get("initial"));
+		final boolean retain=ScriptEngineTools.interpretAsBoolean(params.get("retain"));
+
+		final String expires=(String)params.get("expires");
+
+		srcTopic=TopicCache.convertStatusTopic(srcTopic);
+		final String finalDestTopic=TopicCache.convertSetTopic(destTopic);
+
+		EventCallbackInterface linker=new EventCallbackInterface()
+		{
+			@Override
+			public void run(String topic, Object newValue, Object previousValue, Date previousTimestamp, Object fullValue)
+			{
+				MQTTHandler.doPublish(finalDestTopic, newValue, retain);
+			}
+		};
+
+		int eid=EventHandler.createNewHandler(srcTopic, null, change, linker, oneShot, expires, initial);
+		return eid;
+	}
+
+	/**
+	 *
+	 * Link one topic to another. Each update on the source topic will be set on the
+	 * destination topic. No initial setting occurs.
+	 *
+	 * @param srcTopic
+	 * @param destTopic
+	 * @return id of the new handler (to be used with e.g. remove)
+	 */
+	public int linkValue(String srcTopic,String destTopic)
+	{
+		return linkValue(srcTopic,destTopic,Collections.emptyMap());
+	}
+
 }

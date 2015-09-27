@@ -146,6 +146,10 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.27 - 2015/09/27 - owagner
+  - API: add Events.linkValue()
+  - updated minimal-json to 0.9.4, natty to 0.12 and javax.mail to 1.5.4
+  
 * 0.26 - 2015/09/15 - owagner
   - API: Utilities.sendNetMessage() now accepts an optional encoding parameter
   - exit on any exception when executing a script during startup, not only on ScriptException.
