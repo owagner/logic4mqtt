@@ -5,6 +5,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.logging.*;
 
+import javax.activation.CommandMap;
+import javax.activation.MailcapCommandMap;
 import javax.mail.*;
 import javax.mail.internet.*;
 
@@ -13,7 +15,7 @@ import com.tellerulam.logic4mqtt.*;
 /**
  * The Mail class supports sending E-Mail.
  *
- * It utilizies the Java Mail subsystem: https://java.net/projects/javamail/pages/Home
+ * It utilizes the Java Mail subsystem: https://java.net/projects/javamail/pages/Home
  *
  * Parameters are specified using key=value pairs (or an object in Javascript).
  * Default parameters can be specified using setDefaultParameters() and will
@@ -43,9 +45,18 @@ public class Mail
 
 	private final Properties defaultProperties=new Properties();
 
+	/* Keep private */
 	protected Mail()
 	{
-		/* Keep private */
+		// add handlers for main MIME types (this normally comes from mail.jar's META-INF, but fails
+		// if we have a fat jar
+		MailcapCommandMap mc = (MailcapCommandMap)CommandMap.getDefaultCommandMap();
+		mc.addMailcap("text/html;; x-java-content-handler=com.sun.mail.handlers.text_html");
+		mc.addMailcap("text/xml;; x-java-content-handler=com.sun.mail.handlers.text_xml");
+		mc.addMailcap("text/plain;; x-java-content-handler=com.sun.mail.handlers.text_plain");
+		mc.addMailcap("multipart/*;; x-java-content-handler=com.sun.mail.handlers.multipart_mixed");
+		mc.addMailcap("message/rfc822;; x-java-content-handler=com.sun.mail.handlers.message_rfc822");
+		CommandMap.setDefaultCommandMap(mc);
 	}
 
 	/**

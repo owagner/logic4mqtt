@@ -146,6 +146,10 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.28 - 2015/21/10 - owagner
+  - mail sending was broken when logic4mqtt was deployed as a fat jar due to missing handler map
+    from mail.jar
+
 * 0.27 - 2015/09/27 - owagner
   - API: add Events.linkValue()
   - updated minimal-json to 0.9.4, natty to 0.12 and javax.mail to 1.5.4
