@@ -80,13 +80,13 @@ public class ScriptEngineTools
 		}
 
 		if(v==null)
-			return JsonValue.NULL;
+			return Json.NULL;
 		if(v instanceof Integer)
-			return JsonValue.valueOf(((Integer)v).intValue());
+			return Json.value(((Integer)v).intValue());
 		else if(v instanceof Number)
-			return JsonValue.valueOf(((Number)v).doubleValue());
+			return Json.value(((Number)v).doubleValue());
 		else if(v instanceof Boolean)
-			return ((Boolean)v).booleanValue()?JsonValue.TRUE:JsonValue.FALSE;
+			return ((Boolean)v).booleanValue()?Json.TRUE:Json.FALSE;
 		else if(v instanceof Map) // Will also cover Bindings
 		{
 			JsonObject jso=new JsonObject();
@@ -113,7 +113,7 @@ public class ScriptEngineTools
 			return jsa;
 		}
 		else
-			return JsonValue.valueOf(v.toString());
+			return Json.value(v.toString());
 	}
 	static public String encodeAsJSON(Object v)
 	{

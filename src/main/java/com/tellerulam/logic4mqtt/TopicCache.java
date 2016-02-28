@@ -96,6 +96,17 @@ public class TopicCache
 		return null;
 	}
 
+	public static TopicValue getChangedTopicValue(String topic,int which)
+	{
+		synchronized(topics)
+		{
+			TopicCache t=topics.get(topic);
+			if(t!=null && which<t.changedValues.length)
+				return t.changedValues[which];
+		}
+		return null;
+	}
+
 	public static Map<String, Object> getTopicValues(String topicPattern)
 	{
 		Map<String,Object> values=new HashMap<>();

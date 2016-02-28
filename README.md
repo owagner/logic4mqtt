@@ -1,7 +1,7 @@
 logic4mqtt
 ==========
 
-  Written and (C) 2015 Oliver Wagner <owagner@tellerulam.com> 
+  Written and (C) 2015-16 Oliver Wagner <owagner@tellerulam.com> 
   
   Provided under the terms of the MIT license.
 
@@ -24,6 +24,7 @@ Dependencies
 * Minimal-JSON: https://github.com/ralfstx/minimal-json (used for JSON creation and parsing)
 * natty: http://natty.joestelmach.com/ (used for natural language time parsing)
 * Quartz Scheduler: http://www.quartz-scheduler.org/ (used for cron-alike timer parsing)
+* Java Mail: https://javamail.java.net/ (used for sending E-Mails)
 
 [![Build Status](https://travis-ci.org/owagner/logic4mqtt.svg)](https://travis-ci.org/owagner/logic4mqtt) Automatically built jars can be downloaded from the release page on GitHub at https://github.com/owagner/logic4mqtt/releases
 
@@ -146,7 +147,11 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
-* 0.28 - 2015/21/10 - owagner
+* 0.29 - 2016/02/27 - owagner
+  - API: added Events.getLastChangeTimestamp()
+  - updated quartz-scheduler to 2.2.2 and javax.mail to 1.5.5
+
+* 0.28 - 2015/10/21 - owagner
   - mail sending was broken when logic4mqtt was deployed as a fat jar due to missing handler map
     from mail.jar
 

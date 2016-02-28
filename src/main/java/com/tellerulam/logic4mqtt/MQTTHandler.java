@@ -146,7 +146,7 @@ public class MQTTHandler
 
 		if(trimmedPayload.startsWith("{"))
 		{
-			JsonObject data=JsonObject.readFrom(payload);
+			JsonObject data=Json.parse(payload).asObject();
 			fullValue=convertJsonToJavaObjectTree(data);
 			JsonValue val=data.get("val");
 			if(val==null)
@@ -164,7 +164,7 @@ public class MQTTHandler
 		}
 		else if(trimmedPayload.startsWith("["))
 		{
-			JsonArray data=JsonArray.readFrom(payload);
+			JsonArray data=Json.parse(payload).asArray();
 			fullValue=transformedVal=convertJsonToJavaObjectTree(data);
 		}
 		else

@@ -404,6 +404,20 @@ public class Events
 	}
 
 	/**
+	 * Get the timestamp of the last change of a topic, or null if the topic is not known.
+	 * @param topic
+	 * @return the timestamp, or null
+	 */
+	public Date getLastChangeTimestamp(String topic)
+	{
+		topic=TopicCache.convertStatusTopic(topic);
+		TopicValue tv=TopicCache.getChangedTopicValue(topic, 0);
+		if(tv!=null)
+			return tv.ts;
+		return null;
+	}
+
+	/**
 	 * Request a value via a MQTT /get/ publish
 	 * @param topic
 	 */

@@ -1,4 +1,4 @@
-version = '0.28'
+version = '0.29'
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
@@ -16,13 +16,13 @@ repositories {
 dependencies {
 	compile 'com.eclipsesource.minimal-json:minimal-json:0.9.4'
 	compile 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.0.2'
-	compile 'org.quartz-scheduler:quartz:2.2.1'
+	compile 'org.quartz-scheduler:quartz:2.2.2'
 	compile('com.joestelmach:natty:0.12') {
 		exclude module: 'antlr'
 		exclude module: 'backport-util-concurrent'
 		exclude module: 'stringtemplate'
 	}
-	compile 'com.sun.mail:javax.mail:1.5.4'
+	compile 'com.sun.mail:javax.mail:1.5.5'
 	testCompile 'junit:junit:4.11'
 }
 
