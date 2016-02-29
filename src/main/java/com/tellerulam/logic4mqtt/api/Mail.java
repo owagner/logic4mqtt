@@ -29,6 +29,7 @@ import com.tellerulam.logic4mqtt.*;
  * <li>user - SMTP server login
  * <li>password - SMTP server password
  * <li>priority - X-Priority value (1..5) (highest to lowest)
+ * <li>ignoreMissingFiles - boolean (true/false), do not fail if a file to be attached is missing, just ignore it
  * </ul>
  *
  * Additionally, all of the standard Java Mail API properties are supported:
@@ -127,6 +128,9 @@ public class Mail
 			    if(pri!=null)
 			    	msg.addHeader("X-Priority",pri);
 
+			    String ignoreMissingParam=params.getProperty("ignoreMissingFiles");
+			    boolean ignoreMissingFiles=Boolean.valueOf(ignoreMissingParam);
+
 			    if(attachments!=null)
 			    {
 			    	MimeMultipart mp=new MimeMultipart();
@@ -135,8 +139,14 @@ public class Mail
 			    	mp.addBodyPart(textpart);
 			    	for(String attachment:attachments)
 			    	{
+			    		File f=new File(attachment);
+			    		if(ignoreMissingFiles && !f.exists())
+			    		{
+			    			L.fine("Ignoring attachment "+attachment+", doesn't appear to exist");
+			    			continue;
+			    		}
 			    		MimeBodyPart mbp=new MimeBodyPart();
-			    		mbp.attachFile(new File(attachment));
+			    		mbp.attachFile(f);
 			    		mp.addBodyPart(mbp);
 			    	}
 

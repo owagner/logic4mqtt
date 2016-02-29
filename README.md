@@ -147,6 +147,9 @@ minutes are assumed. The "by" keyword is entirely optional.
 
 Changelog
 ---------
+* 0.30 - 2016/02/29 - owagner
+  - API: added new option "ignoreMissingFiles" to mail properties
+
 * 0.29 - 2016/02/27 - owagner
   - API: added Events.getLastChangeTimestamp()
   - updated quartz-scheduler to 2.2.2 and javax.mail to 1.5.5
